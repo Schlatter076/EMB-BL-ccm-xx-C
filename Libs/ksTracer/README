@@ -1,0 +1,6 @@
+1. for each project, if there is a Proj_cfg.h file, please make modifications in
+   that file to configure the specific tracer intreface. Or else, you should 
+   first copy the tracer_cfg.h.template as tracer_cfg.h in the outter directory,
+   and make your configurations. However, no matter whether the "Proj_cfg.h"
+   exists, the "tracer_cfg.h" should always be here for the module's starting 
+   point.

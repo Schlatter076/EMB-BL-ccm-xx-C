@@ -1,0 +1,45 @@
+////////////////////////////////////////////////////////////////////////////////
+/// <pre>
+/// * File    : "projCfg.h"
+/// * Author  : kensky
+/// * Version :
+/// * Date    : Feb 1, 2014
+/// * Brief   :
+/// * Note    :
+/// </pre>
+////////////////////////////////////////////////////////////////////////////////
+#ifndef __PROJCFG_H_KENSKY_2014
+#define __PROJCFG_H_KENSKY_2014
+
+//******************************************************************************
+#ifdef  __cplusplus
+//******************************************************************************
+//
+// If building with a C++ compiler, make all of the definitions in this header
+// have a C binding.
+//
+extern "C"
+{
+#endif // __cplusplus
+
+/**** Includes ****************************************************************/
+#include "./Proj_cfg/inc/projRetValue.h"
+#include "./Proj_cfg/inc/projSpec.h"
+
+/**** Defines *****************************************************************/
+#define   __MCU_ADDR_SPACE        (_MCU_IS_64_BITS)
+#define   __USE_YK_ASSERT
+
+/**** Includes ****************************************************************/
+#include "./Proj_cfg/inc/projAssert.h"
+
+#ifdef  __cplusplus
+//******************************************************************************
+//
+// Mark the end of the C bindings section for C++ compilers.
+//
+//******************************************************************************
+}
+#endif // __cplusplus
+
+#endif // __PROJCFG_H_KENSKY_2014

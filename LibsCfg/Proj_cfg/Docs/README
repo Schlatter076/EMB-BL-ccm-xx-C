@@ -1,0 +1,6 @@
+1.  please name the directory as Proj_cfg
+2.  copy the Proj_cfg.h.template out to the parent "Libs_cfg" directory, and then
+    rename the file as "Proj_cfg.h"
+3.  now, as a global configuration file ,you can make you own mofdifications
+    based on its structure, if there is any important and approved alteration,
+    you can export it into the Proj_cfg.h.template, and submit.

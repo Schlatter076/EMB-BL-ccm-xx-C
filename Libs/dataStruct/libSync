@@ -1,0 +1,5 @@
+#!bash
+
+git add *
+git commit -m "updating" -s
+git push

@@ -1,0 +1,82 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.pbi
+.pbi.xcl
+*.out
+*.app
+*.i*86
+*.x86_64
+*.map
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.pbi
+*.pbi.xcl
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+./iarProject/ble_peripheral/ble_app_uart/pca10040/s132/iar/_build/*.*
+./iarProject/ble_peripheral/ble_app_uart/pca10040/s132/iar/_build/
+./iarProject/ble_peripheral/ble_app_uart/pca10040/s132/iar/_build
+./projects/IAR/Debug
+Debug/
+.DS_Store
+settings/
+.settings/
+*.swp
+*.swap
+bk/
+
+#*.pbw
+#*.pbd.browse
+#*.pbd
+*.tmp
+#*.dep
+#*.dnx
+#*.wsdt
+#*.linf
+#*.dbgdt
+
+._.*
+/projects/

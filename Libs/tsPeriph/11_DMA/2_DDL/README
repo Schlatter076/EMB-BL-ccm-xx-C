@@ -1,0 +1,20 @@
+/*******************************************************************************
+  * File    : "README"
+  * Author  : Ken_Yang
+  * Version : 0.1
+  * Date    : 2012-9-1
+  * Brief   : This document mainly explain the TI CC1101 module in the PHY layer
+              of this module
+*******************************************************************************/
+GPIO: 
+        
+1_PHY : Physical Layer 
+
+    In this layer, the module mainly concerns the GPIO pins and data interface 
+    between MCU and RF modules. For example, TI CC1101 uses SPI interface to 
+    communicate with MCU, but we should consider that the code is able to be 
+    transplanted to different MCU architectures. So, in that part, the module 
+    needs to know how the GPIOs are defined as well as how the SPI interface is
+    working. 
+
+

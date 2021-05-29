@@ -1,0 +1,50 @@
+/*******************************************************************************
+  * File    : "README"
+  * Author  : Ken_Yang
+  * Version : 0.1
+  * Date    : 2012-9-1
+  * Brief   : This document will briefly explain how the application is organized 
+              into different layers. Each layer is seperated base on some 
+              regulations adopted by many sucessfuly projects. Developers must
+              abide by such common rules in software designing, and also you can
+              provide your suggestions to perfect the ctritrion in such laying 
+              organization!
+*******************************************************************************/
+
+0_Spec: this is a specification used by individual module, and its applicable 
+        scope will mostly be limited in the module itself. hower, something may
+        still applicable to all of the project.(the fact is that many Macros 
+        will of course visible to all routines in the project, especially the 
+        return infomation, developers should always remember and check if such
+        things is confilcted with outter codes)
+        
+
+1_PHY : Physical Layer 
+
+    In this layer, the module mainly concerns the GPIO pins and data interface 
+    between MCU and RF modules. For example, TI CC1101 uses SPI interface to 
+    communicate with MCU, but we should consider that the code is able to be 
+    transplanted to different MCU architectures. So, in that part, the module 
+    needs to know how the GPIOs are defined as well as how the SPI interface is
+    working. For different RF Chips, there must be different PHY to define its
+    hardware interfaces.
+
+
+2_DDL : Device Driver Layer
+    In this layer, the module mainly uses the hardware interfaces defined by PHY,
+    and developer should make approriate adbstraction to make the IC to work. 
+    such as send data, send command, read data, read register information to or 
+    from the RF ICs 
+
+
+3_HAL : Hardware Abstraction Layer
+    In this layer, the module will provide higher layer abstraction for user 
+    applications as well as necessary IRQs. Developer working on the application
+    layer will mainly and almost only concern this lay.
+
+
+4_CFG : Configurations
+
+
+Note: currently, the driver only support the TI CC1101, later on, we will add on 
+      subcequent patches to support RF ICs with similar abstractions.

@@ -1,0 +1,1842 @@
+/*******************************************************************************
+  * File    : "projCfg.h"
+  * Author  : kensky
+  * Version :
+  * Date    : 2020-2-2
+  * Brief   : There will always be such a global cfg file like this one in each
+              project being developed, which can configure necessary parameters
+              controlling the behaviors of the program. Though developers ,with
+              much experience and knowledge about the modules, can still use
+              individual cfg file in each module, it will be much more convenient
+              and clear to handle those parameters here!
+*******************************************************************************/
+#ifndef   __PROJECT_CONFIGURATION_H_20120114YK
+#define   __PROJECT_CONFIGURATION_H_20120114YK
+
+/**** Includes ****************************************************************/
+#include    "./Proj_cfg/inc/projSpec.h"
+#include    "./Proj_cfg/inc/ProjRetValue.h"
+
+extern volatile unsigned char 				mcuEndian;
+/**** Defines *****************************************************************/
+/**** MCU Interface ***********************************************************/
+#define __MCU_TYPE              (_MCU_IS_STM32F10x)
+#define __MCU_CLKSRC            __RCC_64MHZ_HSI08_PLL_PL //HZ, never use bracket
+#define __MCU_FREQ              (64000000ul) //Hz
+#define HSE_VALUE               (8000000ul) //Hz
+#define __MCU_ADDR_SPACE        (_MCU_IS_32_BITS)
+
+/**** module switch ***********************************************************/
+/*******************************************************************************
+ *                      Gloabal configuration SW
+ *  If the MACRO below has been defined, the current configuration file will
+ *  override all other configuration files in each module separately.
+ *  So, developer can make global configuration just in the same location, which
+ *  will considerably make configuration easier and clearer.
+*******************************************************************************/
+#define __PROJ_CONFIGURATION    (_GLOBAL_CONFIGURED)
+#define __RELEASE_MODE           (_MODULE_OFF)
+#define __KS_PERIPH_MODULE      (_MODULE_ON)
+#define __DELAY_MODULE          (_MODULE_ON)
+#define __IR_MODULE             (_MODULE_ON)
+#define __TRACER_MODULE         (_MODULE_ON)
+#define __sFLASH_MODULE         (_MODULE_ON)
+#define __uCOS_MODULE           (_MODULE_OFF)
+#define __RTT_MODULE            (_MODULE_OFF)
+#define __STFWLIB_MODULE        (_MODULE_ON)
+#define __RADIO_MODULE         (_MODULE_OFF)
+#define __TICC3000_MODULE       (_MODULE_OFF)
+#define __SMPL120_MODULE        (_MODULE_OFF)
+#define __KEYPADS_MODULE        (_MODULE_ON)
+#define __LEDs_MODULE           (_MODULE_ON)
+#define __LWIP_MODULE           (_MODULE_OFF)
+#define __LCD_sFLASH_MODULE     (_MODULE_OFF)
+#define __USART_MODULE          (_MODULE_OFF)
+#define __SMS_MODULE            (_MODULE_OFF)
+#define __RTC_MODULE            (_MODULE_OFF)
+#define __E2ROM_MODULE          (_MODULE_ON)
+#define __RULECONN_MODULE       (_MODULE_OFF)
+
+#if (defined __PROJ_CONFIGURATION) && (__PROJ_CONFIGURATION == _GLOBAL_CONFIGURED)
+
+/**** USER ARCH MODULE ********************************************************/
+#if (defined __USER_ARCH_MODULE) && (_MODULE_ON == __USER_ARCH_MODULE)
+
+#if (__MCU_TYPE == _MCU_IS_STM32L0x)
+#define  __NOP()            asm("nop")
+
+typedef   unsigned char     bit, BIT;
+
+
+#else
+#endif
+#endif // __USER_ARCH_MODULE
+
+/**** RTC_MODULE **************************************************************/
+#if (defined __RTC_MODULE) && (_MODULE_ON == __RTC_MODULE)
+#define __RTC_FREQ              (40000u)
+#define __RTC_SOURCE            (rtc_src_is_LSI)
+#define __RTC_SCALE             (1) // the SCALE here can only be 1. (I don't know its meaning)
+#define __RTC_PRESCALER         (1) // SCALE is differnt with prescaler
+#endif
+
+/**** STM32FWLib **************************************************************/
+#if (defined __STFWLIB_MODULE) && (_MODULE_ON == __STFWLIB_MODULE)
+
+#if (__MCU_TYPE == _MCU_IS_STM32F10x)
+#define USE_STDPERIPH_DRIVER
+//#define STM32F10X_LD    // STM32 Low density devices (16-32kb flash)
+//#define STM32F10X_LD_VL // STM32 Low density Value Line devices
+#define STM32F10X_MD    // STM32 Medium density devices (64-128kb flash)
+//#define STM32F10X_MD_VL // STM32 Medium density Value Line devices
+//#define STM32F10X_HD    // STM32 High density devices (256-512kb flash)
+//#define STM32F10X_HD_VL // STM32 High density value line devices
+//#define STM32F10X_XL    // STM32 XL-density devices (768-1024kb flash)
+//#define STM32F10X_CL    // STM32 Connectivity line devices (105 & 107)
+#elif (__MCU_TYPE == _MCU_IS_STM32L1x)
+#define USE_STDPERIPH_DRIVER
+#define STM32L1XX_MD
+//#define STM32L1XX_MDP
+//#define STM32L1XX_HD
+#elif (__MCU_TYPE == _MCU_IS_STM32L0x)
+#define USE_HAL_DRIVER
+//#define STM32L051xx
+#define STM32L052xx
+//#define STM32L053xx
+//#define STM32L061xx
+//#define STM32L062xx
+//#define STM32L063xx
+#elif (__MCU_TYPE == _MCU_IS_STN32F0xx)
+#elif (__MCU_TYPE == _MCU_IS_STN32F0xx)
+#elif (__MCU_TYPE == _MCU_IS_EFM32TGxxx)
+#define DEBUG_EFM
+//#define EFM32TG108F16
+//#define EFM32TG108F32
+//#define EFM32TG108F4
+//#define EFM32TG108F8
+//#define EFM32TG110F16
+//#define EFM32TG110F32
+//#define EFM32TG110F4
+//#define EFM32TG110F8
+//#define EFM32TG210F16
+//#define EFM32TG210F32
+//#define EFM32TG210F8
+//#define EFM32TG222F16
+#define EFM32TG222F32
+//#define EFM32TG222F8
+//#define EFM32TG225F16
+//#define EFM32TG225F32
+//#define EFM32TG225F8
+//#define EFM32TG230F16
+//#define EFM32TG230F32
+//#define EFM32TG230F8
+//#define EFM32TG232F16
+//#define EFM32TG232F32
+//#define EFM32TG232F8
+//#define EFM32TG822F16
+//#define EFM32TG822F32
+//#define EFM32TG822F8
+//#define EFM32TG825F16
+//#define EFM32TG825F32
+//#define EFM32TG825F8
+//#define EFM32TG840F16
+//#define EFM32TG840F32
+//#define EFM32TG840F8
+//#define EFM32TG842F16
+//#define EFM32TG842F32
+//#define EFM32TG842F8
+#else
+#error unsopportted
+#endif // 1
+
+/**** RL Periph Module ********************************************************/
+#if (defined __KS_PERIPH_MODULE) && (_MODULE_ON == __KS_PERIPH_MODULE)
+
+#define __USE_YK_ASSERT
+#define USE_DEFAULT_YK_ASSERTx   // use the assert in the ksPeriph
+#define __MCU_ENDIAN                  (_MCU_is_LITTLE_ENDIAN)
+
+#endif
+
+//#if defined _MODULE_ON
+/**** uCOS290 Module **********************************************************/
+#if (defined __uCOS_MODULE) && (_MODULE_ON == __uCOS_MODULE)
+#endif
+
+/**** RT Thread Module ********************************************************/
+#if (defined __RTT_MODULE) && (_MODULE_ON == __RTT_MODULE)
+/**** board configuration *****************************************************/
+// <o> SDCard Driver <1=>SDIO sdcard <0=>SPI MMC card
+//  <i>Default: 1
+#define STM32_USE_SDIO          1
+
+/**** whether use board external SRAM memory **********************************/
+// <e>Use external SRAM memory on the board
+//  <i>Enable External SRAM memory
+#define STM32_EXT_SRAM          0
+//  <o>Begin Address of External SRAM
+//      <i>Default: 0x68000000
+/**** the begining address of external SRAM ***********************************/
+#define STM32_EXT_SRAM_BEGIN    0x68000000
+//  <o>End Address of External SRAM
+//      <i>Default: 0x68080000
+/**** the end address of external SRAM ****************************************/
+#define STM32_EXT_SRAM_END      0x68080000
+// </e>
+
+// <o> Internal SRAM memory size[Kbytes] <8-64>
+//  <i>Default: 64
+#define STM32_SRAM_SIZE         20
+#define STM32_SRAM_END          (0x20000000 + STM32_SRAM_SIZE * 1024)
+
+// <o> Console on USART: <0=> no console <1=>USART 1 <2=>USART 2 <3=> USART 3
+//  <i>Default: 1
+#define STM32_CONSOLE_USART     2
+
+#if STM32_CONSOLE_USART == 0
+#define CONSOLE_DEVICE "no"
+#elif STM32_CONSOLE_USART == 1
+#define CONSOLE_DEVICE "uart1"
+#elif STM32_CONSOLE_USART == 2
+#define CONSOLE_DEVICE "uart2"
+#elif STM32_CONSOLE_USART == 3
+#define CONSOLE_DEVICE "uart3"
+#endif
+
+// <o> Ethernet Interface: <0=> Microchip ENC28J60 <1=> Davicom DM9000A
+//  <i>Default: 0
+#define STM32_ETH_IF            1
+
+/**** rtconfig ****************************************************************/
+/**** Includes ****************************************************************/
+
+/**** Defines *****************************************************************/
+#define     __RT_PRINTF_STATUS          _RT_MODULE_is_ON
+#define     __RT_DEBUG_STATUS           _RT_MODULE_is_ON
+#define     __RT_ASSERT_STATUS          _RT_MODULE_is_ON
+
+#define     RT_NAME_MAX                 8
+#define     RT_ALIGN_SIZE               4
+#define     RT_THREAD_PRIORITY_MAX      32
+#define     RT_TICK_PER_SECOND          100
+
+/* SECTION: RT_DEBUG */
+/**** Thread Debug ************************************************************/
+#define     RT_DEBUG
+#define     RT_THREAD_DEBUG
+#define     RT_USING_OVERFLOW_CHECK
+#define     RT_USING_HOOK
+
+/**** Using Software Timer ****************************************************/
+//#define     RT_USING_TIMER_SOFT
+#define     RT_TIMER_THREAD_PRIO        4
+#define     RT_TIMER_THREAD_STACK_SIZE  512
+#define     RT_TIMER_TICK_PER_SECOND    10
+
+/**** SECTION: IPC ************************************************************/
+#define     RT_USING_SEMAPHORE      /* Using Semaphore*/
+#define     RT_USING_MUTEX          /* Using Mutex */
+#define     RT_USING_EVENT          /* Using Event */
+#define     RT_USING_MAILBOX        /* Using MailBox */
+#define     RT_USING_MESSAGEQUEUE   /* Using Message Queue */
+
+/**** SECTION: Memory Management **********************************************/
+#define     RT_USING_MEMPOOL        /* Using Memory Pool Management*/
+#define     RT_USING_HEAP           /* Using Dynamic Heap Management */
+#define     RT_USING_SMALL_MEM      /* Using Small MM */
+
+/**** SECTION: Device System **************************************************/
+#define     RT_USING_DEVICE         /* Using Device System */
+#define     RT_USING_UART2
+
+/**** SECTION: Console options ************************************************/
+#define     RT_USING_CONSOLE
+/**** the buffer size of console **********************************************/
+#define     RT_CONSOLEBUF_SIZE          128
+//#define     RT_USING_FINSH          /* SECTION: finsh, a C-Express shell */
+#define     FINSH_USING_SYMTAB      /* Using symbol table */
+#define     FINSH_USING_DESCRIPTION
+
+/**** SECTION: device filesystem **********************************************/
+//#define     RT_USING_DFS
+#define     RT_USING_DFS_ELMFAT
+#define     RT_DFS_ELM_WORD_ACCESS
+/* Reentrancy (thread safe) of the FatFs module.  */
+#define     RT_DFS_ELM_REENTRANT
+/* Number of volumes (logical drives) to be used. */
+#define     RT_DFS_ELM_DRIVES           2
+/* #define RT_DFS_ELM_USE_LFN           1 */
+#define     RT_DFS_ELM_MAX_LFN          255
+/* Maximum sector size to be handled. */
+#define     RT_DFS_ELM_MAX_SECTOR_SIZE  512
+
+/* the max number of mounted filesystem */
+#define     DFS_FILESYSTEMS_MAX         2
+/* the max number of opened files       */
+#define     DFS_FD_MAX                  4
+
+/* SECTION: lwip, a lighwight TCP/IP protocol stack */
+/* #define RT_USING_LWIP */
+/* LwIP uses RT-Thread Memory Management */
+#define     RT_LWIP_USING_RT_MEM
+#define     RT_LWIP_ICMP        /* Enable ICMP protocol*/
+#define     RT_LWIP_UDP         /* Enable UDP protocol*/
+#define     RT_LWIP_TCP         /* Enable TCP protocol*/
+#define     RT_LWIP_DNS         /* Enable DNS */
+
+/**** the number of simulatenously active TCP connections *********************/
+#define     RT_LWIP_TCP_PCB_NUM         5
+
+/**** Using DHCP **************************************************************/
+//#define     RT_LWIP_DHCP
+
+/**** ip address of target ****************************************************/
+#define     RT_LWIP_IPADDR0             192
+#define     RT_LWIP_IPADDR1             168
+#define     RT_LWIP_IPADDR2             1
+#define     RT_LWIP_IPADDR3             30
+
+/**** gateway address of target ***********************************************/
+#define     RT_LWIP_GWADDR0             192
+#define     RT_LWIP_GWADDR1             168
+#define     RT_LWIP_GWADDR2             1
+#define     RT_LWIP_GWADDR3             1
+
+/**** mask address of target **************************************************/
+#define     RT_LWIP_MSKADDR0            255
+#define     RT_LWIP_MSKADDR1            255
+#define     RT_LWIP_MSKADDR2            255
+#define     RT_LWIP_MSKADDR3            0
+
+/**** tcp thread options ******************************************************/
+#define     RT_LWIP_TCPTHREAD_PRIORITY  12
+#define     RT_LWIP_TCPTHREAD_MBOX_SIZE 10
+#define     RT_LWIP_TCPTHREAD_STACKSIZE 1024
+
+/**** ethernet if thread options **********************************************/
+#define     RT_LWIP_ETHTHREAD_PRIORITY  15
+#define     RT_LWIP_ETHTHREAD_MBOX_SIZE 10
+#define     RT_LWIP_ETHTHREAD_STACKSIZE 512
+
+/**** TCP sender buffer space *************************************************/
+#define     RT_LWIP_TCP_SND_BUF         8192
+/**** TCP receive window. *****************************************************/
+#define     RT_LWIP_TCP_WND             8192
+
+/**** SECTION: RT-Thread/GUI **************************************************/
+//#define     RT_USING_RTGUI
+/**** name length of RTGUI object *********************************************/
+#define     RTGUI_NAME_MAX              12
+/**** support 16 weight font **************************************************/
+#define     RTGUI_USING_FONT16
+/**** support Chinese font ****************************************************/
+
+#define     RTGUI_USING_FONTHZ
+/**** use DFS as file interface ***********************************************/
+#define     RTGUI_USING_DFS_FILERW
+/**** use font file as Chinese font *******************************************/
+#define     RTGUI_USING_HZ_FILE
+/**** use Chinese bitmap font *************************************************/
+#define     RTGUI_USING_HZ_BMP
+/**** use small size in RTGUI *************************************************/
+#define     RTGUI_USING_SMALL_SIZE
+/**** use mouse cursor ********************************************************/
+//#define     RTGUI_USING_MOUSE_CURSOR
+/**** default font size in RTGUI **********************************************/
+#define     RTGUI_DEFAULT_FONT_SIZE     16
+
+/**** image support ***********************************************************/
+//#define     RTGUI_IMAGE_XPM
+//#define     RTGUI_IMAGE_BMP
+
+// <bool name="RT_USING_CMSIS_OS" description="Using CMSIS OS API" default="true" />
+// #define RT_USING_CMSIS_OS
+// <bool name="RT_USING_RTT_CMSIS" description="Using CMSIS in RTT" default="true" />
+#define     RT_USING_RTT_CMSIS
+// <bool name="RT_USING_BSP_CMSIS" description="Using CMSIS in BSP" default="true" />
+// #define RT_USING_BSP_CMSIS
+
+#endif // (defined __RTT_MODULE) && (_MODULE_ON == __RTT_MODULE)
+
+/***** Delay Module ***********************************************************/
+#if (defined __DELAY_MODULE) && (_MODULE_ON == __DELAY_MODULE)
+
+#define __DELAY_BEBUG                 (_DLY_DBG_is_OFF)
+#define __DELAY_SOURCE                (_TIMER_DELAY)       // delay_mode_setting
+#if (defined __DELAY_SOURCE) &&       (_TIMER_DELAY == __DELAY_SOURCE)
+#define __DELAY_TIMER_BUS             (is_tim02)  // delay_timer_setting
+#define __DELAY_TIMER_USPERTICK       (0x01)      // adjust the value based on YOUR needs!
+#define __DELAY_TIMER_MAXTICK         (0xffff)    // adjust the value based on the hardware!
+#define __DELAY_TIMER_PRIPRIO         (0) // DELAY will happen in the syncIsr, must be nested
+#define __DELAY_TIMER_SUBPRIO         (0) // make sure this isr has the highest priority!!
+#if (__RTC_MODULE != _MODULE_OFF)
+#define __DELAY_RTC_MS_STATUS   (_RTC_DLY_MS_is_ON)
+#else
+#define __DELAY_RTC_MS_STATUS   (_RTC_DLY_MS_is_OFF)
+#endif
+#endif // (_TIMER_DELAY == __DELAY_SOURCE)
+#endif // (defined __DELAY_MODULE) && (_MODULE_ON == __DELAY_MODULE)
+
+/***** LEDs Module ************************************************************/
+#if (defined __LEDs_MODULE) && (_MODULE_ON == __LEDs_MODULE)
+
+  #define     __LEDS_CNT              (2) // Support 10 LEDs at most
+
+/***** LEDs GPIO Configuration ************************************************/
+ #if (__LEDS_CNT > 0)
+  #define     __LED_1_PORT            (io_Port_1)
+  #define     __LED_1_PIN             (io_Pin_11)
+  #define     __LED_1_DRIVE_MODE      (__LED_HIGH_DRIVE)
+ #endif // (__LEDS_CNT > 0)
+
+ #if (__LEDS_CNT > 1)
+  #define     __LED_2_PORT            (io_Port_1)
+  #define     __LED_2_PIN             (io_Pin_11)
+  #define     __LED_2_DRIVE_MODE      (__LED_HIGH_DRIVE)
+ #endif // (__LEDS_CNT > 1)
+
+#if (__LEDS_CNT > 2)
+  #define     __LED_3_PORT        (io_Port_1)
+  #define     __LED_3_PIN         (io_Pin_11)
+  #define     __LED_3_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 2)
+
+#if (__LEDS_CNT > 3)
+  #define     __LED_4_PORT        (io_Port_1)
+  #define     __LED_4_PIN         (io_Pin_11)
+  #define     __LED_4_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 3)
+
+#if (__LEDS_CNT > 4)
+  #define     __LED_5_PORT        (io_Port_1)
+  #define     __LED_5_PIN         (io_Pin_11)
+  #define     __LED_5_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 4)
+
+#if (__LEDS_CNT > 5)
+  #define     __LED_6_PORT        (io_Port_1)
+  #define     __LED_6_PIN         (io_Pin_11)
+  #define     __LED_6_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 5)
+
+#if (__LEDS_CNT > 6)
+  #define     __LED_7_PORT        (io_Port_1)
+  #define     __LED_7_PIN         (io_Pin_11)
+  #define     __LED_7_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 6)
+
+#if (__LEDS_CNT > 7)
+  #define     __LED_8_PORT        (io_Port_1)
+  #define     __LED_8_PIN         (io_Pin_11)
+  #define     __LED_8_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 7)
+
+#if (__LEDS_CNT > 8)
+  #define     __LED_9_PORT        (io_Port_1)
+  #define     __LED_9_PIN         (io_Pin_11)
+  #define     __LED_9_DRIVE_MODE  (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 8)
+
+#if (__LEDS_CNT > 9)
+  #define     __LED_10_PORT       (io_Port_1)
+  #define     __LED_10_PIN        (io_Pin_11)
+  #define     __LED_10_DRIVE_MODE (__LED_HIGH_DRIVE)
+#endif // (__LEDS_CNT > 9)
+#endif
+
+/***** E2ROM Module ***********************************************************/
+#if (defined __E2ROM_MODULE) && (_MODULE_ON == __E2ROM_MODULE)
+
+#define     __E2ROM_TYPE              (_E2ROM_is_AT24C08)
+
+#define     __E2ROM_CNT               (1)
+#define     __E2ROM_SPEED             (is_10MHz)
+
+#if (1 <= __E2ROM_CNT)
+#define     __E2ROM_1_BUS             (sI2C)
+#define     __E2ROM_1_SDA_PORT        (io_Port_1)
+#define     __E2ROM_1_SDA_PIN         (io_Pin_08)
+#define     __E2ROM_1_SCL_PORT        (io_Port_1)
+#define     __E2ROM_1_SCL_PIN         (io_Pin_09)
+#define     __E2ROM_1_WP_PORT         (io_Port_1)
+#define     __E2ROM_1_WP_PIN          (io_Pin_07)
+#define     __E2ROM_1_DEVADDR         (0x00u) // Only A2~A1
+#endif
+
+#if (2 <= __E2ROM_CNT)
+#define     __E2ROM_2_SDA_PORT      ()
+#define     __E2ROM_2_SDA_PIN       ()
+#define     __E2ROM_2_SCL_PORT      ()
+#define     __E2ROM_2_SCL_PIN       ()
+#define     __E2ROM_2_WP_PORT       ()
+#define     __E2ROM_2_WP_PIN        ()
+#endif
+
+#if (3 <= __E2ROM_CNT)
+#define     __E2ROM_3_SDA_PORT      ()
+#define     __E2ROM_3_SDA_PIN       ()
+#define     __E2ROM_3_SCL_PORT      ()
+#define     __E2ROM_3_SCL_PIN       ()
+#define     __E2ROM_3_WP_PORT       ()
+#define     __E2ROM_3_WP_PIN        ()
+#endif
+
+#endif // (defined __E2ROM_MODULE) && (_MODULE_ON == __E2ROM_MODULE)
+
+/***** sFLASH Module **********************************************************/
+#if (defined __sFLASH_MODULE) && (_MODULE_ON == __sFLASH_MODULE)
+#include <sFlash_spec.h>
+
+/**** Includes ****************************************************************/
+#define   _sFLASH_ByteOrder             (_sFLASH_LittleEndian)
+#define   _sFLASH_BUF_DECLARED          (_sFLASH_DECLARED)
+#define   _sFLASH_BUF_SIZE              (4096ul)        // unit: byte, please make sure this number is multiple of 4
+#define   _sFLASH_TYPE                  (_sFLASH_is_W25Q32)
+#define   _sFLASH_INTERFACE             (_HSPI__FLASH)  // set the interface type
+#define   __sFLASH_IO_Speed             (is_50MHz)
+
+#if (_sFLASH_INTERFACE == _HSPI__FLASH)
+  #define   _sFLASH_HSPI_Ch             (hSPI_2)          // you can choose 1..3 for SPI1..3
+#elif (_sFLASH_INTERFACE == _PARA2_FLASH)
+  #define   _sFLASH_ARRAY_MODE          (_HIGH_08_BITS) // Choose array mode!
+#elif (_sFLASH_INTERFACE == _PARA1_FLASH)
+  #define   _sFLASH_ARRAY_MODE          (_1ST_04_BITS) // Choose array mode!
+#endif
+
+//***** _sFLASH_1 Config ******************************************************/
+#if (_sFLASH_INTERFACE == _SSPI__FLASH) || (_sFLASH_INTERFACE == _HSPI__FLASH)
+#define   __sFLASH_1_MOSI_PORT_N        (io_Port_1)
+#define   __sFLASH_1_MOSI_PIN_N         (io_Pin_08)
+#define   __sFLASH_1_MISO_PORT_N        (io_Port_1)
+#define   __sFLASH_1_MISO_PIN_N         (io_Pin_09)
+#define   __sFLASH_1_WP_PORT_N          (io_Port_1)
+#define   __sFLASH_1_WP_PIN_N           (io_Pin_10)
+#define   __sFLASH_1_HOLD_PORT_N        (io_Port_1)
+#define   __sFLASH_1_HOLD_PIN_N         (io_Pin_11)
+#define   __sFLASH_1_CS_PORT_N          (io_Port_3)
+#define   __sFLASH_1_CS_PIN_N           (io_Pin_00)
+#define   __sFLASH_1_SCK_PORT_N         (io_Port_0)
+#define   __sFLASH_1_SCK_PIN_N          (io_Pin_15)
+#endif // (_sFLASH_INTERFACE == _SSPI__FLASH)
+
+#if (_PARA4_FLASH == _sFLASH_INTERFACE)
+#define   _sFLASH_1_MOSI_PORT_BASE      (io_Port_1)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   _sFLASH_1_MOSI_PIN_NUM        (0U)            // IO0
+#define   _sFLASH_1_MISO_PORT_BASE      (__sFLASH_1_MOSI_PORT_N)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   _sFLASH_1_MISO_PIN_NUM        (1U)            // IO1
+#define   _sFLASH_1_WP_PORT_BASE        (__sFLASH_1_MOSI_PORT_N)    // WP
+#define   _sFLASH_1_WP_PIN_NUM          (2U)            // IO2
+#define   _sFLASH_1_HOLD_PORT_BASE      (__sFLASH_1_MOSI_PORT_N)    // HOLD
+#define   _sFLASH_1_HOLD_PIN_NUM        (3U)            // IO3
+#define   _sFLASH_1_CS_PORT_BASE        (io_Port_1)    // CS /*A*/
+#define   _sFLASH_1_CS_PIN_NUM          (7U)
+#define   _sFLASH_1_SCK_PORT_BASE       (io_Port_1)    // SCK
+#define   _sFLASH_1_SCK_PIN_NUM         (6U)
+#endif
+
+#if (_LOW_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+#define   _sFLASH_1_GPIO_SPEED          (GPIO_Speed_50MHz)
+#define   _sFLASH_1_MOSI_PORT_BASE      (io_Port_1)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   _sFLASH_1_MOSI_PIN_NUM        (io_Pin_08)            // IO0
+#define   _sFLASH_1_MISO_PORT_BASE      (__sFLASH_1_MOSI_PORT_N)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   _sFLASH_1_MISO_PIN_NUM        (io_Pin_09)            // IO1
+#define   _sFLASH_1_WP_PORT_BASE        (__sFLASH_1_MOSI_PORT_N)    // WP
+#define   _sFLASH_1_WP_PIN_NUM          (io_Pin_10)            // IO2
+#define   _sFLASH_1_HOLD_PORT_BASE      (__sFLASH_1_MOSI_PORT_N)    // HOLD
+#define   _sFLASH_1_HOLD_PIN_NUM        (io_Pin_11)            // IO3
+#define   _sFLASH_1_CS_PORT_BASE        (io_Pin_00)    // CS /*A*/
+#define   _sFLASH_1_CS_PIN_NUM          (io_Pin_00)
+#define   _sFLASH_1_SCK_PORT_BASE       (io_Pin_03)    // SCK
+#define   _sFLASH_1_SCK_PIN_NUM         (io_Pin_15)
+#endif // (_LOW_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+
+#if (_HIGH_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+#define   __sFLASH_1_MOSI_PORT_N        (io_Port_1)     // please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MOSI_PIN_N         (io_Pin_08)     // IO0
+#define   __sFLASH_1_MISO_PORT_N        (__sFLASH_1_MOSI_PORT_N)
+#define   __sFLASH_1_MISO_PIN_N         (io_Pin_09)     // IO1
+#define   __sFLASH_1_WP_PORT_N          (__sFLASH_1_MOSI_PORT_N)
+#define   __sFLASH_1_WP_PIN_N           (io_Pin_10)     // IO2
+#define   __sFLASH_1_HOLD_PORT_N        (__sFLASH_1_MOSI_PORT_N)
+#define   __sFLASH_1_HOLD_PIN_N         (io_Pin_11)     // IO3
+#define   __sFLASH_1_CS_PORT_N          (io_Port_3)     // CS
+#define   __sFLASH_1_CS_PIN_N           (io_Pin_00)
+#define   __sFLASH_1_SCK_PORT_N         (io_Port_0)     // SCK
+#define   __sFLASH_1_SCK_PIN_N          (io_Pin_15)
+#endif // (_sFLASH_INTERFACE == _SSPI__FY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+
+#if (_sFLASH_INTERFACE == _PARA1_FLASH)
+#if (_1ST_04_BITS == _sFLASH_ARRAY_MODE)
+#define   __sFLASH_1_MOSI_PORT_N        (io_Port_3)    // please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MOSI_PIN_N         (0U)            // IO0
+#define   __sFLASH_1_MISO_PORT_N        (__sFLASH_1_MOSI_PORT_N)    //  please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MISO_PIN_N         (1U)            // IO1
+#define   __sFLASH_1_WP_PORT_N          (__sFLASH_1_MOSI_PORT_N)    // WP
+#define   __sFLASH_1_WP_PIN_N           (2U)            // IO2
+#define   __sFLASH_1_HOLD_PORT_N        (__sFLASH_1_MOSI_PORT_N)    // HOLD
+#define   __sFLASH_1_HOLD_PIN_N         (3U)            // IO3
+#define   __sFLASH_1_CS_PORT_N          (io_Port_3)    // CS /*A*/
+#define   __sFLASH_1_CS_PIN_N           (7U)
+#define   __sFLASH_1_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_1_SCK_PIN_N          (6U)
+#elif (_2ND_04_BITS == _sFLASH_ARRAY_MODE)
+#define   __sFLASH_1_MOSI_PORT_N        (io_Port_3)    // please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MOSI_PIN_N         (4U)            // IO0
+#define   __sFLASH_1_MISO_PORT_N        (__sFLASH_1_MOSI_PORT_N)    //  please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MISO_PIN_N         (5U)            // IO1
+#define   __sFLASH_1_WP_PORT_N          (__sFLASH_1_MOSI_PORT_N)    // WP
+#define   __sFLASH_1_WP_PIN_N           (6U)            // IO2
+#define   __sFLASH_1_HOLD_PORT_N        (__sFLASH_1_MOSI_PORT_N)    // HOLD
+#define   __sFLASH_1_HOLD_PIN_N         (7U)            // IO3
+#define   __sFLASH_1_CS_PORT_N          (io_Port_3)    // CS /*A*/
+#define   __sFLASH_1_CS_PIN_N           (12U)
+#define   __sFLASH_1_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_1_SCK_PIN_N          (15U)
+#elif (_3RD_04_BITS == _sFLASH_ARRAY_MODE)
+#define   __sFLASH_1_MOSI_PORT_N        (io_Port_3)    // please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MOSI_PIN_N         (8U)            // IO0
+#define   __sFLASH_1_MISO_PORT_N        (__sFLASH_1_MOSI_PORT_N)    //  please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MISO_PIN_N         (9U)            // IO1
+#define   __sFLASH_1_WP_PORT_N          (__sFLASH_1_MOSI_PORT_N)    // WP
+#define   __sFLASH_1_WP_PIN_N           (10U)           // IO2
+#define   __sFLASH_1_HOLD_PORT_N        (__sFLASH_1_MOSI_PORT_N)    // HOLD
+#define   __sFLASH_1_HOLD_PIN_N         (11U)           // IO3
+#define   __sFLASH_1_CS_PORT_N          (io_Port_3)    // CS /*A*/
+#define   __sFLASH_1_CS_PIN_N           (5U)
+#define   __sFLASH_1_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_1_SCK_PIN_N          (2U)
+#elif (_4TH_04_BITS == _sFLASH_ARRAY_MODE)
+#define   __sFLASH_1_MOSI_PORT_N        (io_Port_3)    // please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MOSI_PIN_N         (12U)            // IO0
+#define   __sFLASH_1_MISO_PORT_N        (__sFLASH_1_MOSI_PORT_N)    //  please make sure the MOSI銆�MISO銆乄P銆丠OLD is on the same PORT
+#define   __sFLASH_1_MISO_PIN_N         (13U)            // IO1
+#define   __sFLASH_1_WP_PORT_N          (__sFLASH_1_MOSI_PORT_N)    // WP
+#define   __sFLASH_1_WP_PIN_N           (14U)            // IO2
+#define   __sFLASH_1_HOLD_PORT_N        (__sFLASH_1_MOSI_PORT_N)    // HOLD
+#define   __sFLASH_1_HOLD_PIN_N         (15U)            // IO3
+#define   __sFLASH_1_CS_PORT_N          (io_Port_3)    // CS /*A*/
+#define   __sFLASH_1_CS_PIN_N           (10U)
+#define   __sFLASH_1_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_1_SCK_PIN_N          (8U)
+#endif // (_1ST_04_BITS == _sFLASH_ARRAY_MODE)
+
+#endif // (_sFLASH_INTERFACE == _PARA1_FLASH)
+//***** _sFLASH_1 Config ******************************************************/
+
+//***** _sFLASH_2 Config ******************************************************/
+#if (_PARA4_FLASH == _sFLASH_INTERFACE)
+#define   __sFLASH_2_MOSI_PORT_N        (io_Port_3)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_2_MOSI_PIN_N         (4U)            // IO0
+#define   __sFLASH_2_MISO_PORT_N        (__sFLASH_2_MOSI_PORT_N)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_2_MISO_PIN_N         (5U)            // IO1
+#define   __sFLASH_2_WP_PORT_N          (__sFLASH_2_MOSI_PORT_N)    // WP
+#define   __sFLASH_2_WP_PIN_N           (6U)            // IO2
+#define   __sFLASH_2_HOLD_PORT_N        (__sFLASH_2_MOSI_PORT_N)    // HOLD
+#define   __sFLASH_2_HOLD_PIN_N         (7U)            // IO3
+#define   __sFLASH_2_CS_PORT_N          (io_Port_3)    // CS
+#define   __sFLASH_2_CS_PIN_N           (12U)
+#define   __sFLASH_2_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_2_SCK_PIN_N          (15U)
+#endif // (_PARA4_FLASH == _sFLASH_INTERFACE)
+
+#if (_LOW_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+#define   __sFLASH_2_MOSI_PORT_N        (io_Port_3)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_2_MOSI_PIN_N         (4U)            // IO0
+#define   __sFLASH_2_MISO_PORT_N        (__sFLASH_2_MOSI_PORT_N) 
+#define   __sFLASH_2_MISO_PIN_N         (5U)            // IO1
+#define   __sFLASH_2_WP_PORT_N          (__sFLASH_2_MOSI_PORT_N) 
+#define   __sFLASH_2_WP_PIN_N           (6U)            // IO2
+#define   __sFLASH_2_HOLD_PORT_N        (__sFLASH_2_MOSI_PORT_N) 
+#define   __sFLASH_2_HOLD_PIN_N         (7U)            // IO3
+#define   __sFLASH_2_CS_PORT_N          (io_Port_3)    // CS
+#define   __sFLASH_2_CS_PIN_N           (12U)
+#define   __sFLASH_2_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_2_SCK_PIN_N          (15U)
+#endif // (_LOW_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+
+#if (_HIGH_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+#define   __sFLASH_2_MOSI_PORT_N        (io_Port_1)
+#define   __sFLASH_2_MOSI_PIN_N         (io_Pin_12)     // IO0
+#define   __sFLASH_2_MISO_PORT_N        (__sFLASH_2_MOSI_PORT_N)
+#define   __sFLASH_2_MISO_PIN_N         (io_Pin_13)     // IO1
+#define   __sFLASH_2_WP_PORT_N          (__sFLASH_2_MOSI_PORT_N)
+#define   __sFLASH_2_WP_PIN_N           (io_Pin_14)     // IO2
+#define   __sFLASH_2_HOLD_PORT_N        (__sFLASH_2_MOSI_PORT_N)
+#define   __sFLASH_2_HOLD_PIN_N         (io_Pin_15)     // IO3
+#define   __sFLASH_2_CS_PORT_N          (io_Port_3)     // CS
+#define   __sFLASH_2_CS_PIN_N           (io_Pin_01)
+#define   __sFLASH_2_SCK_PORT_N         (io_Port_0)     // SCK
+#define   __sFLASH_2_SCK_PIN_N          (io_Pin_02)
+#endif // (_HIGH_08_BITS == _sFLASH_ARRAY_MODE) && (_sFLASH_INTERFACE == _PARA2_FLASH)
+//***** _sFLASH_2 Config ******************************************************/
+
+#if (_PARA4_FLASH == _sFLASH_INTERFACE)
+//***** _sFLASH_3 Config ******************************************************/
+#define   __sFLASH_2_MOSI_PORT_N        (io_Port_3)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_2_MOSI_PIN_N         (8U)            // IO0
+#define   __sFLASH_2_MISO_PORT_N        (io_Port_3)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_2_MISO_PIN_N         (9U)            // IO1
+#define   __sFLASH_2_WP_PORT_N          (io_Port_3)    // WP
+#define   __sFLASH_2_WP_PIN_N           (10U)           // IO2
+#define   __sFLASH_2_HOLD_PORT_N        (io_Port_3)    // HOLD
+#define   __sFLASH_2_HOLD_PIN_N         (11U)           // IO3
+#define   __sFLASH_2_CS_PORT_N          (io_Port_3)    // CS
+#define   __sFLASH_2_CS_PIN_N           (5U)
+#define   __sFLASH_2_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_2_SCK_PIN_N          (2U)
+//***** _sFLASH_3 Config ******************************************************/
+
+//***** _sFLASH_4 Config ******************************************************/
+#define   __sFLASH_4_MOSI_PORT_N        (io_Port_3)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_4_MOSI_PIN_N         (12U)           // IO0
+#define   __sFLASH_4_MISO_PORT_N        (io_Port_3)    // 纭欢璁捐鏃讹紝璇锋弧瓒矼OSI銆�MISO銆乄P銆丠OLD鍦ㄥ悓涓�ORT涓�
+#define   __sFLASH_4_MISO_PIN_N         (13U)           // IO1
+#define   __sFLASH_4_WP_PORT_N          (io_Port_3)    // WP
+#define   __sFLASH_4_WP_PIN_N           (14U)           // IO2
+#define   __sFLASH_4_HOLD_PORT_N        (io_Port_3)    // HOLD
+#define   __sFLASH_4_HOLD_PIN_N         (15U)           // IO3
+#define   __sFLASH_4_CS_PORT_N          (io_Port_3)    // CS
+#define   __sFLASH_4_CS_PIN_N           (10U)
+#define   __sFLASH_4_SCK_PORT_N         (io_Port_3)    // SCK
+#define   __sFLASH_4_SCK_PIN_N          (8U)
+//***** _sFLASH_4 Config ******************************************************/
+#endif // (_PARA4_FLASH == _sFLASH_INTERFACE)
+
+#endif //(_MODULE_ON == __sFlash_MODULE)
+
+/**** RF CHIP Modules *******************************************************/
+#if (defined __RADIO_MODULE) && (_MODULE_ON == __RADIO_MODULE) && (1)
+#include <rfChipSpec.h>
+
+#define     __RADIO_MODULE_VER             (0x0) // 0 :: normal, 1 :: new
+
+#define     __RADIO_REG_FILE               _CC1101_REG_CFG_004
+#define     _RADIO_TYPE                    (_RADIO_is_CC1101)
+#define     _RADIO_INTERFACE               (_RADIO_HSPI)      // set the interface type
+#define     __RADIO_ASSERT_STRATEGY        (_RADIO_EXIT_ON_FAULT)
+#define     __RADIO_SELFTEST               (_RF_SELFTEST_ON)
+#define     __RADIO_CHAN_NB                (0x02)
+
+#define     __RADIO_OSC_FREQ               26000000    // Hz
+#define     __RADIO_POWER_SETTING          (_CC1101_P10DB_433MHZ)
+
+#if (_RADIO_HSPI == _RADIO_INTERFACE)
+#define     _RADIO_HSPIn                   (1) // you can choose 1..3 for SPI1..3
+#define     _RADIO_HSPI_PRESCALER          (_SPI_BR_Prescaler_8)
+#endif
+
+#if (0 == __RADIO_MODULE_VER)
+
+#if   (__MCU_TYPE == _MCU_IS_STM32L1x)
+#define     __RADIO_GPIO_SPEED             (is_10MHz)    // for stm32l1x; (is_50MHz) // for stm32f10x
+#elif (__MCU_TYPE == _MCU_IS_STM32F10x)
+#define     __RADIO_GPIO_SPEED             (is_50MHz)    // for stm32l1x; (is_50MHz) // for stm32f10x
+#endif
+#define     __RADIO_MOSI_PORT_N            (io_Port_0)   //  MOSI
+#define     __RADIO_MOSI_PIN_N             (io_Pin_07)
+#define     __RADIO_MISO_PORT_N            (io_Port_0)   //  MISO
+#define     __RADIO_MISO_PIN_N             (io_Pin_06)
+#define     __RADIO_SCK_PORT_N             (io_Port_0)   //  SCK
+#define     __RADIO_SCK_PIN_N              (io_Pin_05)
+
+#define     __RADIO_CS_PORT_N              (io_Port_0)   //  CS
+#define     __RADIO_CS_PIN_N               (io_Pin_02)
+
+#define     __RADIO_GDO0_PORT_N            (io_Port_0)   //  GDO0
+#define     __RADIO_GDO0_PIN_N             (io_Pin_03)
+#define     __RADIO_GDO1_PORT_N            (io_Port_No)   //  GDO0
+#define     __RADIO_GDO1_PIN_N             (io_Pin_03)
+#define     __RADIO_GDO2_PORT_N            (io_Port_0)   //  GDO2
+#define     __RADIO_GDO2_PIN_N             (io_Pin_04)
+#define     __RADIO_GDO3_PORT_N            (io_Port_No)   //  GDO2
+#define     __RADIO_GDO3_PIN_N             (io_Pin_04)
+
+#define     __RADIO_PWR_PORT_N             _GPIO_NoPort  //  pwrIO, make sure the argument is a macro!!
+#define     __RADIO_PWR_PIN_N              (io_Pin_15)
+
+#elif (1 == __RADIO_MODULE_VER)
+#if   (__MCU_TYPE == _MCU_IS_STM32L1x)
+#define     __RADIO_GPIO_SPEED             (is_10MHz)    // for stm32l1x; (is_50MHz) // for stm32f10x
+#elif (__MCU_TYPE == _MCU_IS_STM32F10x)
+#define     __RADIO_GPIO_SPEED             (is_50MHz)    // for stm32l1x; (is_50MHz) // for stm32f10x
+#endif
+#define     __RADIO_MOSI_PORT_N            (io_Port_0)   //  MOSI
+#define     __RADIO_MOSI_PIN_N             (io_Pin_07)
+#define     __RADIO_MISO_PORT_N            (io_Port_0)   //  MISO
+#define     __RADIO_MISO_PIN_N             (io_Pin_06)
+#define     __RADIO_CS_PORT_N              (io_Port_0)   //  CS
+#define     __RADIO_CS_PIN_N               (io_Pin_03)
+#define     __RADIO_SCK_PORT_N             (io_Port_0)   //  SCK
+#define     __RADIO_SCK_PIN_N              (io_Pin_05)
+#define     __RADIO_GDO0_PORT_N            (io_Port_0)   //  GDO0
+#define     __RADIO_GDO0_PIN_N             (io_Pin_02)
+#define     __RADIO_GDO1_PORT_N            (io_Port_No)   //  GDO0
+#define     __RADIO_GDO1_PIN_N             (io_Pin_02)
+#define     __RADIO_GDO2_PORT_N            (io_Port_0)   //  GDO2
+#define     __RADIO_GDO2_PIN_N             (io_Pin_04)
+#define     __RADIO_GDO3_PORT_N            (io_Port_No)   //  GDO2
+#define     __RADIO_GDO3_PIN_N             (io_Pin_04)
+#define     __RADIO_PWR_PORT_N             _GPIO_NoPort  //  pwrIO, make sure the argument is a macro!!
+#define     __RADIO_PWR_PIN_N              (io_Pin_15)
+
+#elif (2 == __RADIO_MODULE_VER)
+#if   (__MCU_TYPE == _MCU_IS_STM32L1x)
+#define     __RADIO_GPIO_SPEED             (is_10MHz)    // for stm32l1x; (is_50MHz) // for stm32f10x
+#elif (__MCU_TYPE == _MCU_IS_STM32F10x)
+#define     __RADIO_GPIO_SPEED             (is_50MHz)    // for stm32l1x; (is_50MHz) // for stm32f10x
+#endif
+#define     __RADIO_MOSI_PORT_N            (io_Port_0) //  MOSI
+#define     __RADIO_MOSI_PIN_N             (io_Pin_07)
+#define     __RADIO_MISO_PORT_N            (io_Port_0) //  MISO
+#define     __RADIO_MISO_PIN_N             (io_Pin_06)
+#define     __RADIO_CS_PORT_N              (io_Port_1) //  CS
+#define     __RADIO_CS_PIN_N               (io_Pin_00)
+#define     __RADIO_SCK_PORT_N             (io_Port_0) //  SCK
+#define     __RADIO_SCK_PIN_N              (io_Pin_05)
+#define     __RADIO_GDO0_PORT_N            (io_Port_0) //  GDO0
+#define     __RADIO_GDO0_PIN_N             (io_Pin_03)
+#define     __RADIO_GDO1_PORT_N            (io_Port_No) //  GDO1
+#define     __RADIO_GDO1_PIN_N             (io_Pin_03)
+#define     __RADIO_GDO2_PORT_N            (io_Port_0) //  GDO2
+#define     __RADIO_GDO2_PIN_N             (io_Pin_04)
+#define     __RADIO_GDO3_PORT_N            (io_Port_No) //  GDO3
+#define     __RADIO_GDO3_PIN_N             (io_Pin_04)
+#define     __RADIO_PWR_PORT_N             io_Port_0 //  pwrIO, make sure the argument is a macro!!
+#define     __RADIO_PWR_PIN_N              (io_Pin_15)
+
+#endif
+/***** NVIC Configuration *****************************************************/
+//extern void MRFI_GpioIsr(void);
+#define     __RADIO_TRx_IRQ_ROUTINE        (0)
+// for SYNC PIN (Tx AND Rx)
+#define     __RADIO_TRx_IRQ_PIN            (_RADIO_GDO0)
+#define     __RADIO_TRx_IRQ_PrePrio        (0u)
+#define     __RADIO_TRx_IRQ_SubPrio        (1u)
+// for Preamble Quality Index
+#define     __RADIO_PQT_IRQ_PIN            (_RADIO_GDO2) // not an ISR
+#define     __RADIO_PQT_IRQ_PrePrio        (0u)
+#define     __RADIO_PQT_IRQ_SubPrio        (15u)
+
+#endif //   (_MODULE_ON == __RADIO_MODULE)
+
+/***** IR Module **************************************************************/
+#if (defined __IR_MODULE) && (_MODULE_ON == __IR_MODULE)
+
+/**** Defines *****************************************************************/
+#define     __IR_DEBUGSTATUS            (_IR_DEBUG_ON)
+#define     __IR_DISP_RAW_DATA          (false)
+#define     __IR_DISP_DEMODULATED_DATA  (true)
+#define     __IR_DISP_ZIPED_DATA        (true)
+
+#if (defined _sFLASH_BUF_DECLARED)  && \
+    (defined _sFLASH_DECLARED)      && \
+    (_sFLASH_DECLARED == _sFLASH_BUF_DECLARED)
+/**** Unit: byte, the value should be multiply of 4 ***************************/
+#define     IR_BUF_SIZE                 (_sFLASH_BUF_SIZE)
+#else
+#define     IR_BUF_SIZE                 (4096)
+#endif
+
+/**** IR data in GPIO *********************************************************/
+#define     __IR_DATA_IN_PORT_N         (io_Port_1)
+#define     __IR_DATA_IN_PIN_N          (io_Pin_06)
+#define     __IR_DATA_IN_SPEED          (is_50MHz)
+#define     __IR_DATA_IN_MODE           (io_Mode_IPU)
+
+/**** IR data out GPIO ********************************************************/
+#define     __IR_DATA_OUT_PORT_N        (io_Port_1)
+#define     __IR_DATA_OUT_PIN_N         (io_Pin_05)
+#define     __IR_DATA_OUT_SPEED         (is_50MHz)
+#define     __IR_DATA_OUT_MODE          (io_Mode_APP)
+#define     __IR_OUT_OCn_CHAN           (2)
+
+/**** IR Timer ****************************************************************/
+// please make sure this para matches with the IR_DATA_OUT_PIN
+#define     __IR_PWM_TIMER_BUS          (is_tim03)
+#define     __IR_TRANCEIVER_TIMER_BUS   (is_tim02)
+#define     __IR_PWM_FREQ               (38000u)// IR PWM Frequency, unit: Hz
+#define     __IR_PWM_DUTYCYCLE          (10u)   // IR PWM Duty cycle, unit %
+
+/**** IR Device Configuration *************************************************/
+#define     __IR_DEV_MAX_CNT            (0x0a)  // the maximum allowed device number
+#define     __IR_DEV_SECTOR_CNT         (4)     // how many sectors are used for a device
+#define     __IR_DEV_SECTOR_SIZE        (4096)  // the size of a sector of the sFlash
+/**** IR Device Configuration *************************************************/
+
+/**** IR Data Buffer Configuration ********************************************/
+#define     __IR_BUF_TYPE               (_IR_BUF_is_sFLASH)
+#define     __IR_BUF_MODE               (_sFLASH_INTERFACE)
+#define     __IR_BUF_START_SECTOR       (0x0000u) // the sector is numbered based on one sFlash
+#define     __IR_BUF_STAGING_SIZE       (0x04)    // how many sector units
+/**** The parameters concerning the IR DATA buf is mostly derived from sFlash */
+
+/**** IR NVIC *****************************************************************/
+#define     __IR_IRQ_PrePrio            (0)
+#define     __IR_IRQ_SubPrio            (0)
+
+#define     IR_TRASMIT_STATUS           (_IR_IN)
+
+#define     _LEARN_IR_DATA              (0)
+#define     _USE_IR_DATA                (1)
+#define     _WORKING_STATUS             (_USE_IR_DATA)
+  
+#define     _BOARD_WITH_sFlash          (0)
+#define     _BOARD_WITHOUT_sFlash       (1)
+#define     _BOARD_STATUS               (_BOARD_WITH_sFlash)
+
+#endif  //  ((_MODULE_ON == __IR_MODULE) && (defined (_USE_GLOBAL_PROJECT_CONFIGURATION)))
+
+
+/***** SMPL Module ************************************************************/
+#if (_MODULE_ON == __SMPL120_MODULE)
+/**** Includes ****************************************************************/
+
+/**** Defines *****************************************************************/
+#define     MRFI_CC1101
+#define     __SMPL_FUNCTION         (_SMPL_LINKTO)
+#define     __SMPL_DEV_TYPE         (_END_DEV)
+
+#if     (__SMPL_DEV_TYPE == _END_DEV)
+/*******************************************************************************
+ * Number of connections supported. each connection supports bi#define irectional
+ * communication.  Access Points and Range Extenders can set this to 0 if they
+ * do not host End Device objects
+*******************************************************************************/
+#define     NUM_CONNECTIONS         2
+
+/***** Size of low-lvl queues for sent and received frames. Affects RAM usage */
+
+/*******************************************************************************
+ * AP needs larger input frame queue if it is supporting store-and-forward
+ * clients because the forwarded messages are held here. Two is probably enough
+ * for an End Device
+*******************************************************************************/
+#define     SIZE_INFRAME_Q          7
+
+/*******************************************************************************
+ * The output frame queue can be small since Tx is done synchronously. Actually
+ * 1 is probably enough. If an Access Point device is also hosting an End Device
+ * that sends to a sleeping peer the output queue should be larger -- the waiting
+ * frames in this case are held here. In that case the output frame queue should
+ * be bigger.
+*******************************************************************************/
+#define     SIZE_OUTFRAME_Q         2
+
+/*******************************************************************************
+ * This device's address. The first byte is used as a filter on the CC1100/CC2500
+ * radios so THE FIRST BYTE MUST NOT BE either 0x00 or 0xFF. Also, for these radios
+ * on End Devices the first byte should be the least significant byte so the filtering
+ * is maximally effective. Otherwise the frame has to be processed by the MCU before it
+ * is recognized as not intended for the device. APs and REs run in promiscuous mode so
+ * the filtering is not done. This macro intializes a static const array of unsigned
+ * characters of length NET_ADDR_SIZE (found in nwk_types.h). the quotes (") are
+ * necessary below unless the spaces are removed.
+*******************************************************************************/
+#define THIS_DEVICE_ADDRESS     {0x02,0x02} // {0x79, 0x56, 0x34, 0x12}
+#define THIS_DEVICE_NETHASH     {0x7b} // {0x79, 0x56, 0x34, 0x12}
+#define THIS_DEVICE_NETID       {0x00,0x00,0x01,0x23,0x46} // {0x79, 0x56, 0x34, 0x12}
+
+#define MAX_HOPS                2 // max hop count -DMAX_HOPS=2
+
+/*******************************************************************************
+ * max hops away from and AP. Keeps hop count and therefore replay
+ * storms down for sending to and from polling End Devices. Also used
+ * when joining since the EDs can't be more than 1 hop away.
+*******************************************************************************/
+#define MAX_HOPS_FROM_AP        1 // -DMAX_HOPS_FROM_AP=1
+
+/*******************************************************************************
+ * Maximum size of Network application payload. Do not change unless
+ * protocol changes are reflected in different maximum network
+ * application payload size.
+*******************************************************************************/
+#define MAX_NWK_PAYLOAD         9 // -DMAX_NWK_PAYLOAD=9
+#define MAX_APP_PAYLOAD         36 /* Maximum size of application payload */
+#define DEFAULT_LINK_TOKEN      0x01020304 /* default Link token */
+#define DEFAULT_JOIN_TOKEN      0x05060708 /* default Join token */
+#define xFREQUENCY_AGILITY      // Remove 'x' to define Freq Agility as active for this build
+#define APP_AUTO_ACK            // Remove 'x' to enable app autoacknowledge. Requires extended API
+#define EXTENDED_API            // Remove 'x' to enable Extended API
+#define xSMPL_SECURE            // Remove 'x' to enable security.
+#define xNVOBJECT_SUPPORT       // Remove 'x' to enable NV object support.
+#define xSW_TIMER               // Remove 'x' to enable software timer.
+#define xFREQUENCY_HOPPING      // Remove 'x' to enable frequency hopping.
+#define BSP_TIMER_USED          BSP_TIMER_A3
+#define xNWK_PLL_REFERENCE_CLOCK // Remove 'x' to make this device the reference clock.
+/* causes leds to blink in 00 -> 01 -> 11 -> 10 -> 00 rotation when FHSS enabled */
+#define NWK_PLL_SHOW_LOCATION_INDICATORS
+
+/***** device type ************************************************************/
+#define END_DEVICE
+
+/*******************************************************************************
+ * For polling End Devices we need to specify that they do so. Uncomment the
+ * macro definition below if this is a polling device. This field is used
+ * by the Access Point to know whether to reserve store-and-forward support
+ * for the polling End Device during the Join exchange.
+*******************************************************************************/
+/* #define RX_POLLS */
+
+#elif   (__SMPL_DEV_TYPE == _ACCESS_POINT)
+
+#define     NUM_CONNECTIONS         2
+#define     SIZE_INFRAME_Q          10
+#define     SIZE_OUTFRAME_Q         4
+#define     THIS_DEVICE_ADDRESS     {0x78,0x56} // {0x79, 0x56, 0x34, 0x12}
+#define     THIS_DEVICE_NETHASH     {0x7b} // {0x79, 0x56, 0x34, 0x12}
+#define     THIS_DEVICE_NETID       {0x00,0x00,0x01,0x23,0x46} // {0x79, 0x56, 0x34, 0x12}
+
+#define     MAX_HOPS                2 // max hop count -DMAX_HOPS=2
+#define     MAX_HOPS_FROM_AP        1 // -DMAX_HOPS_FROM_AP=1
+
+#define     MAX_NWK_PAYLOAD         9 // -DMAX_NWK_PAYLOAD=9
+#define     MAX_APP_PAYLOAD         36 /* Maximum size of application payload */
+#define     DEFAULT_LINK_TOKEN      0x01020304 /* default Link token */
+#define     DEFAULT_JOIN_TOKEN      0x05060708 /* default Join token */
+#define     xFREQUENCY_AGILITY      // Remove 'x' to define Freq Agility as active for this build
+#define     APP_AUTO_ACK            // Remove 'x' to enable app autoacknowledge. Requires extended API
+#define     EXTENDED_API            // Remove 'x' to enable Extended API
+#define     xSMPL_SECURE            // Remove 'x' to enable security.
+#define     xNVOBJECT_SUPPORT       // Remove 'x' to enable NV object support.
+#define     xSW_TIMER               // Remove 'x' to enable software timer.
+#define     xFREQUENCY_HOPPING      // Remove 'x' to enable frequency hopping.
+#define     BSP_TIMER_USED          BSP_TIMER_A3
+#define     xNWK_PLL_REFERENCE_CLOCK // Remove 'x' to make this device the reference clock.
+/* causes leds to blink in 00 -> 01 -> 11 -> 10 -> 00 rotation when FHSS enabled */
+#define     NWK_PLL_SHOW_LOCATION_INDICATORS
+
+/***** device type ************************************************************/
+#define     ACCESS_POINT
+
+/* In the spcial case in which the AP is a data hub, the AP will automaically
+ * listen for a link each time a new device joins the network. This is a special
+ * case scenario in which all End Device peers are the AP and every ED links
+ * to the AP. In this scenario the ED must automatically try and link after the
+ * Join reply.
+ */
+#define     xAP_IS_DATA_HUB
+
+/* Store and forward support: number of clients */
+#define     NUM_STORE_AND_FWD_CLIENTS   3
+
+#define     STARTUP_JOINCONTEXT_ON
+
+/*******************************************************************************
+ * For polling End Devices we need to specify that they do so. Uncomment the
+ * macro definition below if this is a polling device. This field is used
+ * by the Access Point to know whether to reserve store-and-forward support
+ * for the polling End Device during the Join exchange.
+*******************************************************************************/
+/* #define RX_POLLS */
+
+#elif   (__SMPL_DEV_TYPE == _REPEATER)
+#else
+#error wrong device type, please check!!
+#endif
+
+#endif // (_MODULE_ON == __SMPL120_MODULE)
+
+/***** LwIP Module ************************************************************/
+#if (defined __LWIP_MODULE) &&(_MODULE_ON == __LWIP_MODULE)
+/**
+ * SYS_LIGHTWEIGHT_PROT==1: if you want inter-task protection for certain
+ * critical regions during buffer allocation, deallocation and memory
+ * allocation and deallocation.
+ */
+#define SYS_LIGHTWEIGHT_PROT    0
+
+/**
+ * NO_SYS==1: Provides VERY minimal functionality. Otherwise,
+ * use lwIP facilities.
+ */
+#define NO_SYS                  1
+
+/* ---------- Memory options ---------- */
+/* MEM_ALIGNMENT: should be set to the alignment of the CPU for which
+   lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
+   byte alignment -> define MEM_ALIGNMENT to 2. */
+#define MEM_ALIGNMENT           4
+
+/* MEM_SIZE: the size of the heap memory. If the application will send
+a lot of data that needs to be copied, this should be set high. */
+#define MEM_SIZE                (10*1024)
+
+/* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
+   sends a lot of data out of ROM (or other static memory), this
+   should be set high. */
+#define MEMP_NUM_PBUF           10
+/* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
+   per active UDP "connection". */
+#define MEMP_NUM_UDP_PCB        6
+/* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
+   connections. */
+#define MEMP_NUM_TCP_PCB        10
+/* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
+   connections. */
+#define MEMP_NUM_TCP_PCB_LISTEN 6
+/* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
+   segments. */
+#define MEMP_NUM_TCP_SEG        12
+/* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
+   timeouts. */
+#define MEMP_NUM_SYS_TIMEOUT    3
+
+/* ---------- Pbuf options ---------- */
+/* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
+#define PBUF_POOL_SIZE          10
+
+/* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
+#define PBUF_POOL_BUFSIZE       1500
+
+/***** TCP options ************************************************************/
+#define LWIP_TCP                1
+#define TCP_TTL                 255
+
+/***** Controls if TCP should queue segments that arrive out of
+   order. Define to 0 if your device is low on memory. */
+#define TCP_QUEUE_OOSEQ         0
+
+/***** TCP Maximum segment size. **********************************************/
+#define TCP_MSS                 (1500 - 40)
+/* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */
+
+/***** TCP sender buffer space (bytes). ***************************************/
+#define TCP_SND_BUF             (2*TCP_MSS)
+
+/***** TCP sender buffer space (pbufs). This must be at least = 2 *
+   TCP_SND_BUF/TCP_MSS for things to work. */
+#define TCP_SND_QUEUELEN        (6 * TCP_SND_BUF)/TCP_MSS
+
+/**** TCP receive window. *****************************************************/
+#define TCP_WND                 (2*TCP_MSS)
+
+/***** ICMP options ***********************************************************/
+#define LWIP_ICMP               1
+
+/**** DHCP options ************************************************************/
+/* Define LWIP_DHCP to 1 if you want DHCP configuration of
+   interfaces. DHCP is not implemented in lwIP 0.5.1, however, so
+   turning this on does currently not work. */
+#define LWIP_DHCP               0
+
+/**** UDP options *************************************************************/
+#define LWIP_UDP                1
+#define UDP_TTL                 255
+
+/**** Statistics options ******************************************************/
+#define LWIP_STATS              0
+#define LWIP_PROVIDE_ERRNO      1
+
+/**** Checksum options  *******************************************************/
+
+/*
+The STM32F107 allows computing and verifying the IP, UDP, TCP and ICMP checksums by hardware:
+ - To use this feature let the following define uncommented.
+ - To disable it and process by CPU comment the  the checksum.
+*/
+#define CHECKSUM_BY_HARDWARE
+
+#ifdef CHECKSUM_BY_HARDWARE
+  /* CHECKSUM_GEN_IP==0: Generate checksums by hardware for outgoing IP packets.*/
+  #define CHECKSUM_GEN_IP                 0
+  /* CHECKSUM_GEN_UDP==0: Generate checksums by hardware for outgoing UDP packets.*/
+  #define CHECKSUM_GEN_UDP                0
+  /* CHECKSUM_GEN_TCP==0: Generate checksums by hardware for outgoing TCP packets.*/
+  #define CHECKSUM_GEN_TCP                0
+  /* CHECKSUM_CHECK_IP==0: Check checksums by hardware for incoming IP packets.*/
+  #define CHECKSUM_CHECK_IP               0
+  /* CHECKSUM_CHECK_UDP==0: Check checksums by hardware for incoming UDP packets.*/
+  #define CHECKSUM_CHECK_UDP              0
+  /* CHECKSUM_CHECK_TCP==0: Check checksums by hardware for incoming TCP packets.*/
+  #define CHECKSUM_CHECK_TCP              0
+#else
+  /* CHECKSUM_GEN_IP==1: Generate checksums in software for outgoing IP packets.*/
+  #define CHECKSUM_GEN_IP                 1
+  /* CHECKSUM_GEN_UDP==1: Generate checksums in software for outgoing UDP packets.*/
+  #define CHECKSUM_GEN_UDP                1
+  /* CHECKSUM_GEN_TCP==1: Generate checksums in software for outgoing TCP packets.*/
+  #define CHECKSUM_GEN_TCP                1
+  /* CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.*/
+  #define CHECKSUM_CHECK_IP               1
+  /* CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.*/
+  #define CHECKSUM_CHECK_UDP              1
+  /* CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.*/
+  #define CHECKSUM_CHECK_TCP              1
+#endif
+
+/**** Sequential layer options ************************************************/
+/**** LWIP_NETCONN==1: Enable Netconn API (require to use api_lib.c) **********/
+#define LWIP_NETCONN                    0
+
+/**** Socket options **********************************************************/
+/**** LWIP_SOCKET==1: Enable Socket API (require to use sockets.c) ************/
+#define LWIP_SOCKET                     0
+
+#endif // (defined __LWIP_MODULE) &&(_MODULE_ON == __LWIP_MODULE)
+
+/************************* Tracer_Debugger_Module ******************************/
+#if (defined __TRACER_MODULE) && (__TRACER_MODULE == _MODULE_ON)
+#include <tracer_spec.h>
+
+#ifndef __MCU_TYPE
+#define     __MCU_TYPE              (_MCU_IS_STM32F10x)
+#endif
+
+#define     __TRACER_CNT            (2)
+
+#define     __TRACER_TYPE           (_USART_TRACER)
+#if 1
+#define     __TRACER_BUF_TYPE       uchar // Do not add brackets here!
+#define     __TRACER_BUF_SIZE       (20)
+#define     __TRACER_CONSOLE_SIZE   (50)
+#define     __TRACER_PRINTF_STATUS  (_TRACER_ON)
+#define     __TRACER_PRINTFBUF_SIZE (128)
+#define     __TRACER_DMABUF_SIZE    (128)
+#define     __TRACER_CONSOLE        (_TRACER_0)
+#define     __TRACER_OUT            (_TRACER_1)
+#else
+typedef unsigned char* s;
+#define     __TRACER_BUF_TYPE       char // Do not add brackets here!
+#define     __TRACER_BUF_SIZE       (20)
+#define     __TRACER_CONSOLE_SIZE   (50)
+#define     __TRACER_PRINTF_STATUS  (_TRACER_ON)
+#define     __TRACER_PRINTFBUF_SIZE (128)
+#define     __TRACER_CONSOLE        (_TRACER_0)
+#endif
+
+/**** Debugger IO Configuration ***********************************************/
+#if (__TRACER_CNT >= 1)
+
+#define     __TRACER_BDR_1            (921600)        // Baud Rate
+#define     __TRACER_BUS_1            (is_usart1)     // choose the channel
+#define     __TRACER_FLWCNTL          (_TRACER_ON)
+
+#define     __TRACER_ISR_MODE_1       (_TRACER_ISR_DMA)
+
+#if     (__TRACER_ISR_MODE_1 == _TRACER_ISR_NODMA)
+#define     __TRACER_RCVISR_FLAG_1  (USART_IT_RXNE)
+#elif   (__TRACER_ISR_MODE_1 == _TRACER_ISR_DMA)
+#define     __TRACER_RCVISR_FLAG_1    (USART_IT_IDLE)
+#endif
+
+#define     __TRACER_TXISR_FLAG_1     (USART_IT_TC)
+
+#define     __TRACER_RX_PREPRIO_1     (0)
+#define     __TRACER_RX_SUBPRIO_1     (3)
+#define     __TRACER_TX_PREPRIO_1     (0) // for DMA
+#define     __TRACER_TX_SUBPRIO_1     (7) // for DMA
+
+#if (__TRACER_FLWCNTL == _TRACER_ON) // note : used for upper API
+// en? am I available? :: 0 free; 1 : busy
+#define     __TRACER_YK_CTS_PORT_N_1  (io_Port_0)
+#define     __TRACER_YK_CTS_PIN_N_1   (io_Pin_11)
+#define     __TRACER_YK_CTS_MODE_1    (io_Mode_OOD)
+// hi baby, I am coming
+#define     __TRACER_YK_RTS_PORT_N_1  (io_Port_0)
+#define     __TRACER_YK_RTS_PIN_N_1   (io_Pin_12)
+#define     __TRACER_YK_RTS_MODE_1    (io_Mode_FIN)
+#endif // (__TRACER_FLWCNTL == _TRACER_ON)
+
+#define    __TRACER_IO_SPEED_N_1      (is_50MHz)
+
+#define     __TRACER_TX_PORT_N_1      (io_Port_0)     // TXD || MOSI
+#define     __TRACER_TX_PIN_N_1       (io_Pin_09)     // TXD || MOSI
+#define     __TRACER_TX_MODE_1        (io_Mode_APP)        // TXD || MOSI
+
+#define     __TRACER_RX_PORT_N_1      (io_Port_0)     // RXD || MISO
+#define     __TRACER_RX_PIN_N_1       (io_Pin_10)     // RXD || MISO
+#define     __TRACER_RX_MODE_1        (io_Mode_FIN)        // RXD || MISO
+
+#define     __TRACER_SCK_PORT_N_1     (io_Port_No)     // for spi use
+#define     __TRACER_SCK_PIN_N_1      (io_Pin_No)     // for spi use
+#define     __TRACER_SCK_MODE_1       (io_Mode_No)        // for spi use
+// hi baby, I am coming
+#define     __TRACER_RTS_PORT_N_1     (io_Port_0)     // MCU RTS
+#define     __TRACER_RTS_PIN_N_1      (io_Pin_12)     // MCU RTS
+#define     __TRACER_RTS_MODE_1       (io_Mode_FIN)        // MCU RTS
+// en? am I available? :: 0 free; 1 : busy
+#define     __TRACER_CTS_PORT_N_1     (io_Port_0)     // MCU CTS
+#define     __TRACER_CTS_PIN_N_1      (io_Pin_11)     // MCU CTS
+#define     __TRACER_CTS_MODE_1       (io_Mode_OOD)        // MCU CTS
+
+#define     __TRACER_DTR_PORT_N_1     (io_Port_No)     // MCU DTR
+#define     __TRACER_DTR_PIN_N_1      (io_Pin_No)     // MCU DTR
+#define     __TRACER_DTR_MODE_1       (io_Mode_No)        // MCU DTR
+
+#define     __TRACER_DSR_PORT_N_1     (io_Port_No)     // MCU DTR
+#define     __TRACER_DSR_PIN_N_1      (io_Pin_No)     // MCU DTR
+#define     __TRACER_DSR_MODE_1       (io_Mode_No)        // MCU DTR
+
+#define     __TRACER_DCD_PORT_N_1     (io_Port_No)     // MCU DCD
+#define     __TRACER_DCD_PIN_N_1      (io_Pin_No)     // MCU DCD
+#define     __TRACER_DCD_MODE_1       (io_Mode_No)        // MCU DCD
+
+#define     __TRACER_RI_PORT_N_1      (io_Port_No)     // MCU RI
+#define     __TRACER_RI_PIN_N_1       (io_Pin_No)     // MCU RI
+#define     __TRACER_RI_MODE_1        (io_Mode_No)        // MCU RI
+
+#define     __TRACER_CS_PORT_N_1      (io_Port_No)     // for spi use
+#define     __TRACER_CS_PIN_N_1       (io_Pin_No)     // for spi use
+#define     __TRACER_CS_MODE_1        (io_Mode_No)        // for spi use
+
+#endif // (__TRACER_CNT >= 1)
+
+#if (__TRACER_CNT >= 2)
+
+#define    __TRACER_IO_SPEED_N_2      (is_50MHz)
+
+#define     __TRACER_BDR_2            (115200)        // Baud Rate
+#define     __TRACER_BUS_2            (is_usart3)     // choose the channel
+
+#define     __TRACER_ISR_MODE_2       (_TRACER_ISR_NODMA)
+
+#if     (__TRACER_ISR_MODE_2 == _TRACER_ISR_NODMA)
+#define     __TRACER_RCVISR_FLAG_2  (USART_IT_RXNE)
+#elif   (__TRACER_ISR_MODE_2 == _TRACER_ISR_DMA)
+#define     __TRACER_RCVISR_FLAG_1    (USART_IT_IDLE)
+#endif
+
+#define     __TRACER_TX_PORT_N_2      (io_Port_1)     // MCU TXD || MOSI
+#define     __TRACER_TX_PIN_N_2       (io_Pin_10)     // MCU TXD || MOSI
+#define     __TRACER_TX_MODE_2        (io_Mode_APP)        // MCU TXD || MOSI
+
+#define     __TRACER_RX_PORT_N_2      (io_Port_1)     // MCU RXD || MISO
+#define     __TRACER_RX_PIN_N_2       (io_Pin_11)     // MCU RXD || MISO
+#define     __TRACER_RX_MODE_2        (io_Mode_AIN)        // MCU RXD || MISO
+
+#define     __TRACER_SCK_PORT_N_2     (io_Port_No)     // for spi use
+#define     __TRACER_SCK_PIN_N_2      (io_Pin_No)     // for spi use
+#define     __TRACER_SCK_MODE_2       (io_Mode_No)        // for spi use
+
+#define     __TRACER_RTS_PORT_N_2     (io_Port_No)     // MCU RTS
+#define     __TRACER_RTS_PIN_N_2      (io_Pin_No)     // MCU RTS
+#define     __TRACER_RTS_MODE_2       (io_Mode_No)        // MCU RTS
+
+#define     __TRACER_CTS_PORT_N_2     (io_Port_No)     // MCU CTS
+#define     __TRACER_CTS_PIN_N_2      (io_Pin_No)     // MCU CTS
+#define     __TRACER_CTS_MODE_2       (io_Mode_No)        // MCU CTS
+
+#define     __TRACER_DTR_PORT_N_2     (io_Port_No)     // MCU DTR
+#define     __TRACER_DTR_PIN_N_2      (io_Pin_No)     // MCU DTR
+#define     __TRACER_DTR_MODE_2       (io_Mode_No)        // MCU DTR
+
+#define     __TRACER_DSR_PORT_N_2     (io_Port_No)     // MCU DCD
+#define     __TRACER_DSR_PIN_N_2      (io_Pin_No)     // MCU DCD
+#define     __TRACER_DSR_MODE_2       (io_Mode_No)        // MCU DCD
+
+#define     __TRACER_DCD_PORT_N_2     (io_Port_No)     // MCU DCD
+#define     __TRACER_DCD_PIN_N_2      (io_Pin_No)     // MCU DCD
+#define     __TRACER_DCD_MODE_2       (io_Mode_No)        // MCU DCD
+
+#define     __TRACER_RI_PORT_N_2      (io_Port_No)     // MCU RI
+#define     __TRACER_RI_PIN_N_2       (io_Pin_No)     // MCU RI
+#define     __TRACER_RI_MODE_2        (io_Mode_No)        // MCU RI
+
+#define     __TRACER_CS_PORT_N_2      (io_Port_No)     // for spi use
+#define     __TRACER_CS_PIN_N_2       (io_Pin_No)     // for spi use
+#define     __TRACER_CS_MODE_2        (io_Mode_No)        // for spi use
+
+#endif // (__TRACER_CNT >= 2)
+
+#endif // (defined __TRACER_MODULE) && (__TRACER_MODULE == _MODULE_ON)
+
+/**** LCD_sFLASH Module *******************************************************/
+#if (defined __LCD_sFLASH_MODULE) && (__LCD_sFLASH_MODULE == _MODULE_ON)
+
+/***** Peripheral Type ********************************************************/
+#define __USED_LCD_TYPE                 (__LCD_UPD161704)
+#define __USED_sFLASH_TYPE              (__sFLASH_W25Q16)
+
+/**** LCD Info ****************************************************************/
+#define __LCD_PIXEL_SIZE                (16ul)
+#define __LCD_X_SIZE                    (240u)
+#define __LCD_Y_SIZE                    (320u)
+
+/**** LCD_DEBUG Status ********************************************************/
+#define __LCD_DBG_Status                (_LCD_DEBUG)
+
+/***** GPIO Configuration *****************************************************/
+#define __LCD_GPIO_SPEED                (GPIO_Speed_50MHz)
+
+#define __LCD_LED_PORT_BASE             (GPIOC_BASE)  //  LED
+#define __LCD_LED_PIN_NUM               (14U)
+#define __LCD_RST_PORT_BASE             (GPIOC_BASE)  // RST, connect to MCU RST Pin directly
+#define __LCD_RST_PIN_NUM               (0U)
+#define __LCD_CS_PORT_BASE              (GPIOC_BASE)  // CS
+#define __LCD_CS_PIN_NUM                (4U)
+#define __LCD_RD_PORT_BASE              (GPIOA_BASE)  // RD
+#define __LCD_RD_PIN_NUM                (4U)
+/**** LCD WR pin must locate on the same port as SSPI CLK pins ****************/
+#define __LCD_WR_PORT_BASE              (GPIOA_BASE)  // wr, check if the port is the same with sFlash sck
+#define __LCD_WR_PIN_NUM                (3U)          // the pin should be different
+#define __LCD_RS_PORT_BASE              (GPIOC_BASE)  // RS
+#define __LCD_RS_PIN_NUM                (5U)
+#define __LCD_sFLASH_DATA_PORT_BASE     (GPIOB_BASE)  // DATA_Pins
+#define __LCD_sFLASH_DATA_PIN           (0x00FF)
+
+/**** Module Switch ***********************************************************/
+#define __BMP_MODULE                    (_LCD_DISABLE)
+#define __ICON_MODULE                   (_LCD_DISABLE)
+#define __GRAPH_2D_MODULE               (_LCD_ENABLE)
+#define __TEXT_MODULE                   (_LCD_DISABLE)
+#if (defined __TEXT_MODULE) && (__TEXT_MODULE != _LCD_DISABLE)
+#define __NUM_DISP_MODULE               (_LCD_ENABLE)
+#else
+#define __NUM_DISP_MODULE               (_LCD_DISABLE)
+#endif // (TEXT_MODULE > _GUI_DISABLED)
+
+/**** Fonts Storing configuration *********************************************/
+/**** FONT Configuration ******************************************************/
+/**** Fonts Switch ************************************************************/
+#if (defined __TEXT_MODULE) && (__TEXT_MODULE == _LCD_ENABLE)
+#define __Font_dzlt_14_14_SWITCH        (_LCD_ENABLE)
+#define __Font_dzlt_10_SWITCH           (_LCD_ENABLE)
+#define __UNICODE_SUPPORT               (_LCD_ENABLE)
+#else
+#define __Font_dzlt_14_14_SWITCH        (_LCD_DISABLE)
+#define __Font_dzlt_10_SWITCH           (_LCD_DISABLE)
+#define __UNICODE_SUPPORT               (_LCD_DISABLE)
+#endif // TEXT_MODULE > _GUI_DISABLED
+
+#define __FONT_CNT_IN_FLASH             (0x03u)         // for LCD, 3 Fonts is enough!
+/**** please remember, font1 must be a full and the longest charset lib *******/
+#define __FONT1_COUNT                   (8000ul)        // the maximum number allocated for storing font1
+#define __FONT1_SIZE                    (14ul)          // FONT <= 14*14 Full
+#define __FONT2_COUNT                   (__FONT1_COUNT) // the maximum number allocated for storing font2
+#define __FONT2_SIZE                    (24ul)          // FONT <= 24*24 Full
+#define __FONT3_COUNT                   (200ul)         // the maximum number allocated for storing font3
+#define __FONT3_SIZE                    (36ul)          // FONT <= 36*36 Partial
+
+#if (defined __TEXT_MODULE) && (__TEXT_MODULE == _LCD_ENABLE)
+#define __FONT1                         GUI_FontHZdzlt10_CharInfo
+#define __FONT2                         GUI_FontHZdzlt_14_14_No_10_CharInfo
+#define __FONT3                         GUI_FontHZdzlt10_CharInfo
+
+#define __FONT_SIZE_16                  (1u)
+#define __FONT_SIZE_24                  (1u)
+#define __FONT_SIZE_32                  (1u)
+#else
+#define __FONT1                         (1u)
+#define __FONT2                         (2u)
+#define __FONT3                         (3u)
+
+#define __FONT_SIZE_16                  (__FONT1)
+#define __FONT_SIZE_24                  (__FONT2)
+#define __FONT_SIZE_32                  (__FONT3)
+#endif
+
+/**** BMPs Storing configuration **********************************************/
+#define __STORED_BMP_COUNT              (17U)
+
+/**** BMPs Switch *************************************************************/
+#if (defined __BMP_MODULE) && (__BMP_MODULE ==  _LCD_ENABLE)
+#define __bm_taskbar_SWITCH             (_LCD_ENABLE)
+#define __bm_remote_SWITCH              (_LCD_ENABLE)
+#define __bm_button_SWITCH              (_LCD_ENABLE)
+#define __bm_button_white_SWITCH        (_LCD_ENABLE)
+#define __bm_FancoilCold_SWITCH         (_LCD_ENABLE)
+#define __bm_FancoilHot_SWITCH          (_LCD_ENABLE)
+#else
+#define __bm_taskbar_SWITCH             (_LCD_DISABLE)
+#define __bm_remote_SWITCH              (_LCD_DISABLE)
+#define __bm_button_SWITCH              (_LCD_DISABLE)
+#define __bm_button_white_SWITCH        (_LCD_DISABLE)
+#define __bm_FancoilCold_SWITCH         (_LCD_DISABLE)
+#define __bm_FancoilHot_SWITCH          (_LCD_DISABLE)
+#endif // (__BMP_MODULE > _GUI_DISABLED)
+
+/**** ICONs Switch ************************************************************/
+#if (defined __ICON_MODULE) && (__ICON_MODULE != _LCD_DISABLE)
+ #define __ico_AirCon_SWITCH            (_LCD_ENABLE)
+ #define __ico_CD_SWITCH                (_LCD_ENABLE)
+ #define __ico_COPY_SWITCH              (_LCD_ENABLE)
+ #define __ico_DVD_SWITCH               (_LCD_ENABLE)
+ #define __ico_DVD_56_SWITCH            (_LCD_ENABLE)
+ #define __ico_Arrow_SWITCH             (_LCD_ENABLE)
+ #define __ico_Frame_SWITCH             (_LCD_ENABLE)
+ #define __ico_NT_Config_SWITCH         (_LCD_ENABLE)
+ #define __ico_SCENE_SWITCH             (_LCD_ENABLE)
+ #define __ico_SETTOP_SWITCH            (_LCD_ENABLE)
+ #define __ico_SWITCH_SWITCH            (_LCD_ENABLE)
+ #define __ico_TV_SWITCH                (_LCD_ENABLE)
+#else
+#define __ico_AirCon_SWITCH             (_LCD_DISABLE)
+#define __ico_CD_SWITCH                 (_LCD_DISABLE)
+#define __ico_COPY_SWITCH               (_LCD_DISABLE)
+#define __ico_DVD_SWITCH                (_LCD_DISABLE)
+#define __ico_DVD_56_SWITCH             (_LCD_DISABLE)
+#define __ico_Arrow_SWITCH              (_LCD_DISABLE)
+#define __ico_Frame_SWITCH              (_LCD_DISABLE)
+#define __ico_NT_Config_SWITCH          (_LCD_DISABLE)
+#define __ico_SCENE_SWITCH              (_LCD_DISABLE)
+#define __ico_SETTOP_SWITCH             (_LCD_DISABLE)
+#define __ico_SWITCH_SWITCH             (_LCD_DISABLE)
+#define __ico_TV_SWITCH                 (_LCD_DISABLE)
+#endif // (ICON_MODULE > _GUI_DISABLED)
+
+/**** __BMP1: 240 * 320 bm_wmplayer *******************************************/
+#if (defined __STORED_BMP_COUNT) && (__STORED_BMP_COUNT >= 1)
+ extern const LCD_sFlash_BMP_TypeDef    bmp_FancoilCold;
+ #define __BMP1                         (&bmp_FancoilCold)
+ #define __BMP1_WIDTH                   (240ul)
+ #define __BMP1_LENGTH                  (320ul)
+ #define __BMP1_TYPE                    (_BMP_TYPE)
+#endif // (defined __STORED_BMP_COUNT) && (__STORED_BMP_COUNT >= 1)
+
+/**** __BMP2: 100 * 231 bm_remote *********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    bmp_FancoilHot;
+ #define __BMP2                         (&bmp_FancoilHot)
+ #define __BMP2_WIDTH                   (240ul)
+ #define __BMP2_LENGTH                  (320ul)
+ #define __BMP2_TYPE                    (_BMP_TYPE)
+
+/**** __BMP3: 240 * 25 bm_taskbar *********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    bmp_remote;
+ #define __BMP3                         (&bmp_remote)
+ #define __BMP3_WIDTH                   (100ul)
+ #define __BMP3_LENGTH                  (231ul)
+ #define __BMP3_TYPE                    (_BMP_TYPE)
+
+/**** __BMP4: 240 * 30 bm_button **********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    bmp_button;
+ #define __BMP4                         (&bmp_button)
+ #define __BMP4_WIDTH                   (240ul)
+ #define __BMP4_LENGTH                  (30ul)
+ #define __BMP4_TYPE                    (_BMP_TYPE)
+
+/**** __BMP5: 70 * 30 bm_button_white_70_30 ***********************************/
+ extern const LCD_sFlash_BMP_TypeDef    bmp_button_white;
+ #define __BMP5                         (&bmp_button_white)
+ #define __BMP5_WIDTH                   (70ul)
+ #define __BMP5_LENGTH                  (30ul)
+ #define __BMP5_TYPE                    (_BMP_TYPE)
+
+/**** __BMP6: 36 * 36 bm_AirCon ***********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_AirCon;
+ #define __BMP6                         (&ico_AirCon)
+ #define __BMP6_WIDTH                   (36ul)
+ #define __BMP6_LENGTH                  (36ul)
+ #define __BMP6_TYPE                    (_ICO_TYPE)
+
+/**** __BMP7: 36 * 36 bm_CD ***************************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_CD;
+ #define __BMP7                         (&ico_CD)
+ #define __BMP7_WIDTH                   (36ul)
+ #define __BMP7_LENGTH                  (36ul)
+ #define __BMP7_TYPE                    (_ICO_TYPE)
+
+/**** __BMP8: 36 * 36 bm_COPY *************************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_COPY;
+ #define __BMP8                         (&ico_COPY)
+ #define __BMP8_WIDTH                   (36ul)
+ #define __BMP8_LENGTH                  (36ul)
+ #define __BMP8_TYPE                    (_ICO_TYPE)
+
+/**** __BMP9: 36 * 36 bm_DVD **************************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_DVD;
+ #define __BMP9                         (&ico_DVD)
+ #define __BMP9_WIDTH                   (36ul)
+ #define __BMP9_LENGTH                  (36ul)
+ #define __BMP9_TYPE                    (_ICO_TYPE)
+
+/**** __BMP10: 36 * 36 bm_DVD_56 **********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_DVD_56;
+ #define __BMP10                        (&ico_DVD_56)
+ #define __BMP10_WIDTH                  (56ul)
+ #define __BMP10_LENGTH                 (56ul)
+ #define __BMP10_TYPE                   (_ICO_TYPE)
+
+/**** __BMP11: 23 * 22 bm_Arrow ***********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_Arrow;
+ #define __BMP11                        (&ico_Arrow)
+ #define __BMP11_WIDTH                  (23ul)
+ #define __BMP11_LENGTH                 (22ul)
+ #define __BMP11_TYPE                   (_ICO_TYPE)
+
+/**** __BMP12: 56 * 56 bm_Frame ***********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_Frame;
+ #define __BMP12                        (&ico_Frame)
+ #define __BMP12_WIDTH                  (56ul)
+ #define __BMP12_LENGTH                 (56ul)
+ #define __BMP12_TYPE                   (_ICO_TYPE)
+
+/**** __BMP13: 36 * 36 bm_NT_Config *******************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_NT_Config;
+ #define __BMP13                        (&ico_NT_Config)
+ #define __BMP13_WIDTH                  (36ul)
+ #define __BMP13_LENGTH                 (36ul)
+ #define __BMP13_TYPE                   (_ICO_TYPE)
+
+/**** __BMP14: 36 * 36 bm_SCENE ***********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_SCENE;
+ #define __BMP14                        (&ico_SCENE)
+ #define __BMP14_WIDTH                  (36ul)
+ #define __BMP14_LENGTH                 (36ul)
+ #define __BMP14_TYPE                   (_ICO_TYPE)
+
+/**** __BMP15: 36 * 36 bm_SETTOP **********************************************/
+ extern const LCD_sFlash_BMP_TypeDef    ico_SETTOP;
+ #define __BMP15                        (&ico_SETTOP)
+ #define __BMP15_WIDTH                  (36ul)
+ #define __BMP15_LENGTH                 (36ul)
+ #define __BMP15_TYPE                   (_ICO_TYPE)
+
+/**** __BMP16: 36 * 36 bm_SWITCH ***********************************************/
+ extern const LCD_sFlash_BMP_TypeDef       ico_SWITCH;
+ #define __BMP16                           (&ico_SWITCH)
+ #define __BMP16_WIDTH                     (36ul)
+ #define __BMP16_LENGTH                    (36ul)
+ #define __BMP16_TYPE                      (_ICO_TYPE)
+
+/**** __BMP17: 36 * 36 bm_TV ***************************************************/
+ extern const LCD_sFlash_BMP_TypeDef       ico_TV;
+ #define __BMP17                           (&ico_TV)
+ #define __BMP17_WIDTH                     (36ul)
+ #define __BMP17_LENGTH                    (36ul)
+ #define __BMP17_TYPE                      (_ICO_TYPE)
+
+#endif // (defined __LCD_sFLASH_MODULE) && (__LCD_sFLASH_MODULE == _MODULE_ON)
+
+/**** USART Module ************************************************************/
+#if (defined __STFWLIB_MODULE) && (_MODULE_ON == __USART_MODULE)
+
+#endif
+
+/**** KeyPads Module **********************************************************/
+#if (defined __KEYPADS_MODULE) && (_MODULE_ON == __KEYPADS_MODULE)
+#include <KeyPads_Spec.h>
+
+ /***** Choose Key Pad type: __KEY_ARRAY || __KEY_BUTTON ***********************/
+ #define    __KEYPADS_INTERFACE             (__KEY_BUTTON)
+ #define    __KEYPADS_IO_SPEED              (is_02MHz)
+ #define    __KEYPADS_ANTISHAKE_TIMER       (is_tim04)
+ #define    __KEYPADS_ANTISHAKE_PERIOD      (50) // ms
+ #define    __ANTISHAKE_TIMER_NVIC_PRE      (0)
+ #define    __ANTISHAKE_TIMER_NVIC_SUB      (9)
+
+ #if (__KEY_ARRAY == __KEYPADS_INTERFACE)
+ #define     __KEY_ARRAY_NUM                (3u)            // only define pins to form the array
+                                            
+ #define     __KEYPADS_IRQ_PORT_BASE        (GPIOA_BASE)    // Key_Irq_Pin
+ #define     __KEYPADS_IRQ_PIN_NUM          (0U)
+ #define     __KEYPADS_ARRAY_IRQ_MODE       (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_IRQ_INITSTATUS       (__INIT_HIGH)
+ #define     __KEYARRAY_NVIC_PRE            (0)
+ #define     __KEYARRAY_NVIC_SUB            (0)
+                                            
+ #define     __KEYPADS_PULL_PORT_BASE       (GPIOA_BASE)    // Key_Pull_Pin
+ #define     __KEYPADS_PULL_PIN_NUM         (15U)
+ #define     __KEYPADS_PULL_IRQ_MODE        (noneTrigger)
+ #define     __KEYPADS_PULLL_INITSTATUS     (__INIT_HIGH)
+ #elif   (__KEY_BUTTON == __KEYPADS_INTERFACE)
+ #define     __KEY_BUTTON_NUM               (1)
+ #else
+ #error  Wrong KeyPads Interface!!
+ #endif
+
+ /***** Key Pads GPIO Configuration ************************************************/
+#if (__KEY_BUTTON_NUM > 0) || (__KEY_ARRAY_NUM > 0)
+extern void Socket_Key_CalllBack(void);
+
+#define     __KEYPADS_KEY_DPRESS_MS         (200) // 200 miniseconds for double click
+
+#define     __KEYPADS_KEY1_PORT             (io_Port_1)
+#define     __KEYPADS_KEY1_PIN_N            (io_Pin_12)
+#define     __KEYPADS_KEY1_MODE             (io_Mode_FIN)
+#define     __KEYPADS_KEY1_IRQ_MODE         (Falling)
+#define     __KEYPADS_KEY1_INITSTATUS       (__INIT_HIGH)
+#define     __KEYPADS_KEY1_NVIC_PRE         (0)
+#define     __KEYPADS_KEY1_NVIC_SUB         (7)
+#define     __KEYPADS_KEY1_LPRESS_MS        (1000)  // ms
+#define     __KEYPADS_KEY1_PRESSED_CB       (0)     // NULL
+#define     __KEYPADS_KEY1_SPRESSED_CB      (ApKeyReleasedCallBack)
+#define     __KEYPADS_KEY1_DPRESSED_CB      (ApKeyReleasedCallBack)
+#define     __KEYPADS_KEY1_LPRESSED_CB      (ApKeyReleasedCallBack)
+#endif // (__KEY_BUTTON_NUM > 0) || (__KEY_ARRAY_NUM > 0)
+
+ #if (__KEY_BUTTON_NUM > 1) || (__KEY_ARRAY_NUM > 1)
+#define     __KEYPADS_KEY2_PORT             (io_Port_1)
+#define     __KEYPADS_KEY2_PIN_N            (io_Pin_12)
+#define     __KEYPADS_KEY2_MODE             (io_Mode_FIN)
+#define     __KEYPADS_KEY2_IRQ_MODE         (__FALLING_EDGE_TRIGGER)
+#define     __KEYPADS_KEY2_INITSTATUS       (__INIT_HIGH)
+#define     __KEYPADS_KEY2_NVIC_PRE         (0)
+#define     __KEYPADS_KEY2_NVIC_SUB         (0)
+#define     __KEYPADS_KEY2_PRESSED_CB       (0)     // NULL
+#define     __KEYPADS_KEY2_SPRESSED_CB      (ApKeyReleasedCallBack)
+#define     __KEYPADS_KEY2_DPRESSED_CB      (ApKeyReleasedCallBack)
+#define     __KEYPADS_KEY2_LPRESSED_CB      (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 1) || (__KEY_ARRAY_NUM > 1)
+
+ #if (__KEY_BUTTON_NUM > 2) || (__KEY_ARRAY_NUM > 2)
+#define     __KEYPADS_KEY3_PORT             (GPIOA_BASE)
+#define     __KEYPADS_KEY3_PIN_N            (12U)
+#define     __KEYPADS_KEY3_MODE             (io_Mode_FIN)
+#define     __KEYPADS_KEY3_IRQ_MODE         (__FALLING_EDGE_TRIGGER)
+#define     __KEYPADS_KEY3_INITSTATUS       (__INIT_HIGH)
+#define     __KEYPADS_KEY3_NVIC_PRE         (0)
+#define     __KEYPADS_KEY3_NVIC_SUB         (0)
+#define     __KEYPADS_KEY3_PRESSED_CB       (0)     // NULL
+#define     __KEYPADS_KEY3_SPRESSED_CB      (ApKeyReleasedCallBack)
+#define     __KEYPADS_KEY3_DPRESSED_CB      (ApKeyReleasedCallBack)
+#define     __KEYPADS_KEY3_LPRESSED_CB      (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 2) || (__KEY_ARRAY_NUM > 2)
+
+ #if (__KEY_BUTTON_NUM > 3) || (__KEY_ARRAY_NUM > 3)
+ #define     __KEYPADS_KEY4_PORT_BASE       (GPIOB_BASE)
+ #define     __KEYPADS_KEY4_PIN_NUM         (11U)
+ #define     __KEYPADS_KEY4_IRQ_MODE        (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY4_INITSTATUS      (__INIT_HIGH)
+ #define     __KEYPADS_KEY4_NVIC_PRE        (0)
+ #define     __KEYPADS_KEY4_NVIC_SUB        (0)
+ #define     __KEYPADS_KEY4_PRESSED_CB      (0)     // NULL
+ #define     __KEYPADS_KEY4_SPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY4_DPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY4_LPRESSED_CB     (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 3) || (__KEY_ARRAY_NUM > 3)
+
+ #if (__KEY_BUTTON_NUM > 4) || (__KEY_ARRAY_NUM > 4)
+ #define     __KEYPADS_KEY5_PORT_BASE       (GPIOB_BASE)
+ #define     __KEYPADS_KEY5_PIN_NUM         (11U)
+ #define     __KEYPADS_KEY5_IRQ_MODE        (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY5_INITSTATUS      (__INIT_HIGH)
+ #define     __KEYPADS_KEY5_NVIC_PRE        (0)
+ #define     __KEYPADS_KEY5_NVIC_SUB        (0)
+ #define     __KEYPADS_KEY5_PRESSED_CB      (0)     // NULL
+ #define     __KEYPADS_KEY5_SPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY5_DPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY5_LPRESSED_CB     (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 4) || (__KEY_ARRAY_NUM > 4)
+
+ #if (__KEY_BUTTON_NUM > 5) || (__KEY_ARRAY_NUM > 5)
+ #define     __KEYPADS_KEY6_PORT_BASE       (GPIOB_BASE)
+ #define     __KEYPADS_KEY6_PIN_NUM         (11U)
+ #define     __KEYPADS_KEY6_IRQ_MODE        (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY6_INITSTATUS      (__INIT_HIGH)
+ #define     __KEYPADS_KEY6_NVIC_PRE        (0)
+ #define     __KEYPADS_KEY6_NVIC_SUB        (0)
+ #define     __KEYPADS_KEY6_PRESSED_CB      (0)     // NULL
+ #define     __KEYPADS_KEY6_SPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY6_DPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY6_LPRESSED_CB     (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 5) || (__KEY_ARRAY_NUM > 5)
+
+ #if (__KEY_BUTTON_NUM > 6) || (__KEY_ARRAY_NUM > 6)
+ #define     __KEYPADS_KEY7_PORT_BASE       (GPIOB_BASE)
+ #define     __KEYPADS_KEY7_PIN_NUM         (11U)
+ #define     __KEYPADS_KEY7_IRQ_MODE        (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY7_INITSTATUS      (__INIT_HIGH)
+ #define     __KEYPADS_KEY7_NVIC_PRE        (0)
+ #define     __KEYPADS_KEY7_NVIC_SUB        (0)
+ #define     __KEYPADS_KEY7_PRESSED_CB      (0)     // NULL
+ #define     __KEYPADS_KEY7_SPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY7_DPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY7_LPRESSED_CB     (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 6) || (__KEY_ARRAY_NUM > 6)
+
+ #if (__KEY_BUTTON_NUM > 7) || (__KEY_ARRAY_NUM > 7)
+ #define     __KEYPADS_KEY8_PORT_BASE       (GPIOB_BASE)
+ #define     __KEYPADS_KEY8_PIN_NUM         (11U)
+ #define     __KEYPADS_KEY8_IRQ_MODE        (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY8_INITSTATUS      (__INIT_HIGH)
+ #define     __KEYPADS_KEY8_NVIC_PRE        (0)
+ #define     __KEYPADS_KEY8_NVIC_SUB        (0)
+ #define     __KEYPADS_KEY8_PRESSED_CB      (0)     // NULL
+ #define     __KEYPADS_KEY8_SPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY8_DPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY8_LPRESSED_CB     (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 7) || (__KEY_ARRAY_NUM > 7)
+
+ #if (__KEY_BUTTON_NUM > 8) || (__KEY_ARRAY_NUM > 8)
+ #define     __KEYPADS_KEY9_PORT_BASE       (GPIOB_BASE)
+ #define     __KEYPADS_KEY9_PIN_NUM         (11U)
+ #define     __KEYPADS_KEY9_IRQ_MODE        (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY9_INITSTATUS      (__INIT_HIGH)
+ #define     __KEYPADS_KEY9_NVIC_PRE        (0)
+ #define     __KEYPADS_KEY9_NVIC_SUB        (0)
+ #define     __KEYPADS_KEY9_PRESSED_CB      (0)     // NULL
+ #define     __KEYPADS_KEY9_SPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY9_DPRESSED_CB     (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY9_LPRESSED_CB     (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 8) || (__KEY_ARRAY_NUM > 8)
+
+ #if (__KEY_BUTTON_NUM > 9) || (__KEY_ARRAY_NUM > 9)
+ #define     __KEYPADS_KEY10_PORT_BASE      (GPIOB_BASE)
+ #define     __KEYPADS_KEY10_PIN_NUM        (11U)
+ #define     __KEYPADS_KEY10_IRQ_MODE       (__FALLING_EDGE_TRIGGER)
+ #define     __KEYPADS_KEY10_INITSTATUS     (__INIT_HIGH)
+ #define     __KEYPADS_KEY10_NVIC_PRE       (0)
+ #define     __KEYPADS_KEY10_NVIC_SUB       (0)
+ #define     __KEYPADS_KEY10_PRESSED_CB     (0)     // NULL
+ #define     __KEYPADS_KEY10_SPRESSED_CB    (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY10_DPRESSED_CB    (ApKeyReleasedCallBack)
+ #define     __KEYPADS_KEY10_LPRESSED_CB    (ApKeyReleasedCallBack)
+ #endif // (__KEY_BUTTON_NUM > 9) || (__KEY_ARRAY_NUM > 9)
+
+ #if (__KEY_ARRAY == __KEYPADS_INTERFACE)
+ #define     __KEY_TURN_ON                  (0x0021u)  // K1
+ #define     __KEY_MODE                     (0x0031u)  // K2
+ #define     __KEY_VOLUME                   (0x0032u)  // K4
+ #define     __KEY_ADVANCED                 (0x0012u)  // K3
+ #define     __KEY_UP                       (0x0013u)  // K5
+ #define     __KEY_LOW                      (0x0023u)  // K6
+ #elif (__KEY_BUTTON == __KEYPADS_INTERFACE)
+ #else
+ #error Wrong KeyPads Interfaces!!
+ #endif
+#endif
+
+/**** RULECONN Module *********************************************************/
+/**** Defines *****************************************************************/
+#if (defined __RULECONN_MODULE) && (_MODULE_ON == __RULECONN_MODULE)
+#include <revoSpec.h>
+
+#define     __RULE_ISR_DEBUGx // FOR TEST, YOU CAN ADD A x TO SHUT IT OFF
+#define     __RULE_STARTUP_DELAY        (0x14ul)
+#define     __RULE_RND_START            (5)
+
+#define     __RULE_ETH_VER              (0x0100u)
+#define     __RULE_ETH_MAGIC            (0x00345678u) // ff for endian needed to be filled!
+
+#define     __RULE_INTERFACE            (_RVCOM_IMPLEMENTATION)
+
+#if (__RULE_INTERFACE == _RVCOM_IMPLEMENTATION)
+
+#define     __RULE_DEV_PRIADDR          (0x0018)
+
+#if (__RULE_NWK_ROLE != _RULE_COR_DEV)
+#define     __RULE_SYNC_DAD_ADDR        (_RULE_AP_ADDR) // x for dynamic routing
+#define     __RULE_SYNC_DAD_ADDRx       (_RULE_EXT0_ADDR) // x for dynamic routing
+#endif
+
+#define     __RV_DEV_MAX_SUBADDR        (2) // 0, 1, 2
+
+#define     __RULE_TIMER_BUS                (is_tim03)
+
+#define     __RULE_TIMER_PRIPRIO        (0)
+#define     __RULE_TIMER_SUBPRIO        (0)
+
+#define     __RULE_ACK_FAIL_CALLBACK    NULL
+#define     __RULE_ACK_DONE_CALLBACK    NULL
+
+#if     (__RULE_NWK_ROLE == _RULE_END_DEV)
+
+#define     __RULE_DEV_CMD_TYPE         (_RULE_DEV_LAMP)
+
+#elif   (__RULE_NWK_ROLE == _RULE_COR_DEV)
+
+#elif   (__RULE_NWK_ROLE == _RULE_EXT_DEV)
+
+#endif
+
+#endif // (__RULE_INTERFACE == _RVCOM_IMPLEMENTATION)
+
+#endif // __RULECONN_MODULE
+
+
+#endif // (defined __PROJ_CONFIGURATION) && (__PROJ_CONFIGURATION == _GLOBAL_CONFIGURED)
+
+/**** Includes ****************************************************************/
+#include "./Proj_cfg/inc/projAssert.h"
+
+#endif // __PROJECT_CONFIGURATION_H_20120114YK

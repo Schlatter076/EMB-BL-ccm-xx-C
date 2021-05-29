@@ -1,0 +1,16 @@
+*.o
+*.O
+*.bak
+*.pbi
+*.lst
+*.i
+Thumbs.db
+*.db
+*.map
+*.hex
+*.lnk
+*.out
+*.sim
+_Docs/Doxygen/OutPut
+.output/
+.DS_Store

@@ -1,0 +1,36 @@
+[submodule "FF_3rdPty/CC1310fwlib"]
+	path = FF_3rdPty/CC1310fwlib
+	url = gito-repoMac:CC1310fwlib_Lite
+[submodule "FF_3rdPty/EFM32xxfwlib"]
+	path = FF_3rdPty/EFM32xxfwlib
+	url = gito-repoMac:EFM32xxfwlib_Lite
+[submodule "FF_3rdPty/FSKLxxZ4fwlib"]
+	path = FF_3rdPty/FSKLxxZ4fwlib
+	url = gito-repoMac:FSKLxxZ4fwlib
+[submodule "FF_3rdPty/NRF51_52fwlib"]
+	path = FF_3rdPty/NRF51_52fwlib
+	url = gito-repoMac:NRF51_52fwlib_Lite
+[submodule "FF_3rdPty/STM32F0fwlib"]
+	path = FF_3rdPty/STM32F0fwlib
+	url = gito-repoMac:STM32F0fwlib_Lite
+[submodule "FF_3rdPty/STM32F1fwlib"]
+	path = FF_3rdPty/STM32F1fwlib
+	url = gito-repoMac:STM32F1fwlib_Lite
+[submodule "FF_3rdPty/STM32F2fwlib"]
+	path = FF_3rdPty/STM32F2fwlib
+	url = gito-repoMac:STM32F2fwlib_Lite
+[submodule "FF_3rdPty/STM32L0fwlib"]
+	path = FF_3rdPty/STM32L0fwlib
+	url = gito-repoMac:STM32L0fwlib_Lite
+[submodule "FF_3rdPty/STM32Lxfwlib"]
+	path = FF_3rdPty/STM32Lxfwlib
+	url = gito-repoMac:STM32Lxfwlib_Lite
+[submodule "FF_3rdPty/EFR32xGfwlib"]
+	path = FF_3rdPty/EFR32xGfwlib
+	url = gito-repoIAR:EFR32xGfwlib_Lite
+[submodule "FF_3rdPty/STM32F4fwlib"]
+	path = FF_3rdPty/STM32F4fwlib
+	url = gito-repoIAR:STM32F4fwlib_Lite
+[submodule "FF_3rdPty/HSDC32L1xxfwlib"]
+	path = FF_3rdPty/HSDC32L1xxfwlib
+	url = gito-repoIAR:HSDC32L1xxfwlib

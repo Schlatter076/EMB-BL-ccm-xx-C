@@ -1,0 +1,12 @@
+in the directory, the first two digits indicates the main dev number, as is the 
+type of the device. so a device number is orgnaized as follows: 
+main_dev_num + minor_dev_num, the data structure is defined as this:
+
+typedef struct
+{
+    unsigned char   major_num;
+    unsigned char   minor_num;
+}
+
+so, by such combination, the device number can specify a certain periphral 
+interface, the information is explained as device type and device number.

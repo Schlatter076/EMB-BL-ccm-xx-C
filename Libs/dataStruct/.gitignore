@@ -1,0 +1,16 @@
+*.o
+*.O
+*.bak
+*.d
+*.a
+/Debug/
+Doxygen/
+/iarProjects/Debug/
+app/.output
+app/user/.output
+/bin/
+*.dump
+/.output/
+/Queue/.output/
+*/.output/
+.DS_Store
