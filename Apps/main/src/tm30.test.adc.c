@@ -45,12 +45,12 @@ tm30AdcTest_t gv_tm30TestAdc =
       .chn        =
       {
         {ADC_Ch03, ADC_ChNo},  // 0x00, 0x02 are tested
-        {ADC_ChNo, ADC_ChNo},
+        {ADC_Ch02, ADC_ChNo},
         {ADC_ChNo, ADC_ChNo},
         {ADC_ChNo, ADC_ChNo},
       },
       .group      = ADC_GRP_No,
-      .conversion = ADC_Conv_Single,
+      .conversion = ADC_Scan_single,
       .dataAlign  = ADC_ALIGN_No,
       .sampleTime = /* ADC_Sample_005_micro, // */ ADC_Sample_010_micro,
       .resolution = ADC_12_bits, // */ ADC_10_bits,
@@ -129,7 +129,6 @@ void tm30AdcTestCallBack (void)
     NRF_SAADC->EVENTS_DONE = 0x00;
   }
 }
-
 /*!
  * @fn    tm30AdcTestInit
  * @param pADC
