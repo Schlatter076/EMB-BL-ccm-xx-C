@@ -592,12 +592,12 @@ int main()
 				k2);// in 100%
 
 		//*/
-		if (lv_Vout > 300 || lv_bl_Vout > 300)
+		if (lv_Vout > 200 || lv_bl_Vout > 200)
 		{
 			LEDs_On(&gv_ledPeriph[0]); //马达启动
 			if (lv_Vout > lv_bl_Vout)
 			{
-				if (lv_Vout > 300 && k1 <= 1 && (lv_Vout - lv_bl_Vout) > 100)
+				if (lv_Vout > 200 && k1 <= 1 && (lv_Vout - lv_bl_Vout) > 60)
 				{
 					LEDs_On(&gv_ledPeriph[1]);
 					LEDs_Off(&gv_ledPeriph[6]);
@@ -609,7 +609,7 @@ int main()
 			}
 			else
 			{
-				if (lv_bl_Vout > 300 && k2 <= 1 && (lv_bl_Vout - lv_Vout) > 100)
+				if (lv_bl_Vout > 200 && k2 <= 1 && (lv_bl_Vout - lv_Vout) > 60)
 				{
 					LEDs_On(&gv_ledPeriph[6]);
 					LEDs_Off(&gv_ledPeriph[1]);
