@@ -26,12 +26,6 @@
 #include "../../main/inc/tm30.test.adc.h"
 #include "../../callbacks/inc/tsTracerRxCallBacks.h"
 
-static const ksU08 lc_cmdGetForce[] =
-{ 0x01, 0x03, 0x00, 0x00, 0x00, 0x0D, 0x84, 0x0F, };
-
-static float lv_forceInGF = 0.1f;
-// 18 -> PC; 14 -> AiDeBao; 05 <- WM
-
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
 #define   __PIN_TO_ADB          0x0E
@@ -57,7 +51,6 @@ static float lv_forceInGF = 0.1f;
 #endif
 
 static ksU32 lv_aiDeBaoCntr = 0x00;
-static ksU32 lv_wmUartCntr = 0x00;
 
 static ksS32 lv_filteredADC = 0x00;
 static ksS32 lv_Vout = 0x00;
@@ -68,94 +61,6 @@ static ksS32 lv_bl_filteredADC = 0x00;
 static ksS32 lv_bl_Vout = 0x00;
 static ksS32 lv_bl_resistorVal = 0x00;
 static ksS32 lv_bl_resistorValPrev = 0x00;
-
-#if (__THOR_MODE == _THOR_WANMO)
-/**
- *
- * @param pTracer
- * @param pByte
- */
-static void wmUardDataHandler (ksTracer_t *pTracer, ksU08 *pByte)
-{
-  uchar        rcvdByte  = *pByte;
-  tracerBuf_t  *pRxBuf   = &uTracer[__UTRACER_IDX_1].rxBuf;
-
-  pRxBuf->buf[pRxBuf->len++] = rcvdByte;
-
-  if (lv_wmUartCntr == __WANMO_PKT_LEN)
-  {
-    pRxBuf->status = _tracer_Recved;
-  }
-  else if (lv_wmUartCntr > __WANMO_PKT_LEN)
-  {
-    lv_wmUartCntr = 0x00;
-    deInitUtracerRxBuf();
-  }
-}
-
-static void wmGetAdcRecvISR (void)
-{
-  ksUSART_t *pUart = uTracer[__UTRACER_IDX_1].pUsart;
-
-  if(__USART_RECV_is_PENDING(pUart))
-  {
-    ksU08           rcvdByte  = ksUsartGetByte(pUart);
-    tracerStatus_e  status    = uTracer[__UTRACER_IDX_1].rxBuf.status;
-    // 52 A1 08 00 C1 56 78 00
-    switch (status)
-    {
-      case _tracer_free :
-      {
-        switch (lv_wmUartCntr)
-        {
-          case 0x00 :
-          {
-            if ((0x52 != rcvdByte) && (0x42 != rcvdByte))
-            {
-              lv_wmUartCntr = 0x00;
-              deInitUtracerRxBuf();
-              goto __EXIT_wmUartReturnRecvISR;
-            }
-          }
-          break;
-
-          case 0x01 :
-          {
-            if (0xA1 != rcvdByte)
-            {
-              lv_wmUartCntr = 0x00;
-              deInitUtracerRxBuf();
-              goto __EXIT_wmUartReturnRecvISR;
-            }
-          }
-          break;
-
-          case 0x02 :
-          {
-             if (0x08 != rcvdByte)
-             {
-              lv_wmUartCntr = 0x00;
-              deInitUtracerRxBuf();
-              goto __EXIT_wmUartReturnRecvISR;
-             }
-          }
-          break;
-        }
-      }
-      break;
-
-      default :
-        goto __EXIT_wmUartReturnRecvISR;
-    }
-    ++lv_wmUartCntr;
-    wmUardDataHandler(&uTracer[__UTRACER_IDX_1], &rcvdByte);
-
-__EXIT_wmUartReturnRecvISR :
-    ksUsartClrITFlag(pUart, pUart->RX_isr.flag);
-    NRF_UART0->EVENTS_ERROR = 0x00;
-  }
-}
-#endif
 
 /**
  * @fn aiDeBaoRcvdDataHandler
@@ -439,6 +344,19 @@ static void bissellBufferKinestate(void)
 
 	lv_BL_KineState += deltaAbs; // less than 255
 }
+/**
+ * @fn       根据斜率和电阻值计算压力
+ * @slope    斜率
+ * @resistor 电阻值
+ */
+float getForceBySlopeAndResistor(float slope, ksS32 resistor)
+{
+	float admittance = 100000000.0f / resistor;
+	float force = (admittance - 304.3) / slope;
+	if (force < 0)
+		force = 0.0f;
+	return force;
+}
 
 /**
  * @fn main
@@ -446,7 +364,13 @@ static void bissellBufferKinestate(void)
  */
 int main()
 {
-	unsigned int k1 = 0, k2 = 0;
+	ksU16 k1 = 0, k2 = 0;
+	float gf1 = 0.0f;
+	float gf2 = 0.0f;
+	ksS32 gf1_Int = 0;
+	ksS32 gf1_Decimal = 0;
+	ksS32 gf2_Int = 0;
+	ksS32 gf2_Decimal = 0;
 	mcuBSPInit(aiDeBaoReturnRecvISR);
 
 	uTracer[__UTRACER_IDX_1].pUsart->gpio[_KS_USART_IO_TXD].Pin.pinNum =
@@ -472,7 +396,7 @@ int main()
 	__uTRACER_PRINTF(__TRACER_OUT, true,
 			"\n*********************************************\n");
 	__uTRACER_PRINTF(__TRACER_OUT, true,
-			"***********The thor is running***************\n");
+			"***********This is bissell program*************\n");
 	__uTRACER_PRINTF(__TRACER_OUT, true,
 			"*********************************************\n");
 
@@ -481,44 +405,7 @@ int main()
 	thorDeInitKineStateQ();
 	while (true)
 	{
-		/*
-		 uTracerRemapUart(__PIN_TO_ADB);
-		 do
-		 { // receive forve value from aidebao
-		 __uTRACER_SEND_BUF(__TRACER_OUT,  &lc_cmdGetForce, sizeof(lc_cmdGetForce));
-		 ksDelayMsByLoop(200);
-		 } while(true && (_tracer_Recved != uTracer[__UTRACER_IDX_1].rxBuf.status));
-
-		 ksU32 *pForceInteger =
-		 (ksU32*) &uTracer[__UTRACER_IDX_1].rxBuf.buf[0x03];
-		 *pForceInteger = ks_htonl(*pForceInteger);
-
-		 float *pForceFloat = (float*) &uTracer[__UTRACER_IDX_1].rxBuf.buf[0x03];
-
-		 lv_forceInGF = *pForceFloat;
-		 lv_forceInGF *= -1000.0f;
-
-		 lv_aiDeBaoCntr = 0x00;
-		 deInitUtracerRxBuf();
-		 //*/
-
-#if   (__THOR_MODE == _THOR_NORMAL)
-
 		tm30AdcDoSampleing(&gv_tm30TestAdc);
-
-		/*
-		 __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d, %d\n",
-		 gv_tm30TestAdc.adcBuf[0],
-		 gv_tm30TestAdc.adcBuf[1],
-		 gv_tm30TestAdc.adcBuf[2],
-		 gv_tm30TestAdc.adcBuf[3],
-		 gv_tm30TestAdc.adcBuf[4],
-		 gv_tm30TestAdc.adcBuf[5],
-		 gv_tm30TestAdc.adcBuf[6],
-		 gv_tm30TestAdc.adcBuf[7]);
-
-		 //*/
-
 		// calculation
 		lv_filteredADC = rcFilter(gv_tm30TestAdc.adcBuf[0], lv_filteredADC, 5);
 		lv_Vout = lv_filteredADC * __REF_VOLTAGE / 4096;
@@ -537,30 +424,6 @@ int main()
 		lv_bl_resistorVal = (__SUPPLY_VOLTAGE - lv_bl_Vout) * __DIVIDOR_RESISTOR
 				/ lv_bl_Vout;
 
-#elif (__THOR_MODE == _THOR_WANMO)
-    deInitUtracerRxBuf();
-    uTracerRemapUart(__PIN_FROM_WM);
-    while(_tracer_Recved != uTracer[__UTRACER_IDX_1].rxBuf.status);
-
-    ksU16 adcVal = 0x00;
-    adcVal  = uTracer[__UTRACER_IDX_1].rxBuf.buf[0x04];
-    adcVal += uTracer[__UTRACER_IDX_1].rxBuf.buf[0x03] << 0x08;
-
-   ksS16 adcValSigned = (ksS16)adcVal;
-
-    // TODO
-    lv_filteredADC      = rcFilter(adcValSigned, lv_filteredADC, 5);
-    lv_Vout             = lv_filteredADC * __REF_VOLTAGE / 32768;
-
-    lv_resistorValPrev  = lv_resistorVal;
-    lv_resistorVal      = (__SUPPLY_VOLTAGE -  lv_Vout) * __DIVIDOR_RESISTOR /  lv_Vout;
-
-    lv_wmUartCntr = 0x00;
-    deInitUtracerRxBuf();
-
-    uTracerRemapUart(__PIN_TO_ADB);
-#endif
-
 		thorBufferKinestate();
 		bissellBufferKinestate();
 
@@ -573,20 +436,33 @@ int main()
 			lv_bl_resistorVal = 1;
 		}
 
-		ksS32 gfInt = (ksS32) (lv_forceInGF * 10);
-		ksS32 gfDecimal = gfInt % 10;
-		if (gfDecimal < 0)
-		{
-			gfDecimal = -1 * gfDecimal;
-		}
-
 		k1 = lv_THOR_KineState * 100 / lv_resistorVal;
 		k2 = lv_BL_KineState * 100 / lv_bl_resistorVal;
-		uTracerRemapUart(__PIN_TO_PC);
-		__uTRACER_PRINTF(__TRACER_OUT, true, "%7d, %4d, %3d, %7d, %4d, %3d\n",
-				lv_resistorVal, // resisor
+
+		gf1 = getForceBySlopeAndResistor(3.32f, lv_resistorVal);
+		gf1_Int = (ksS32) (gf1 * 10);
+		gf1_Decimal = gf1_Int % 10;
+		if (gf1_Decimal < 0)
+		{
+			gf1_Decimal = -1 * gf1_Decimal;
+		}
+		gf2 = getForceBySlopeAndResistor(3.32f, lv_bl_resistorVal);
+		gf2_Int = (ksS32) (gf2 * 10);
+		gf2_Decimal = gf2_Int % 10;
+		if (gf2_Decimal < 0)
+		{
+			gf2_Decimal = -1 * gf2_Decimal;
+		}
+
+		__uTRACER_PRINTF(__TRACER_OUT, true,
+				"%4d.%1d, %7d, %4d, %3d; %4d.%1d, %7d, %4d, %3d\n", //format
+				gf1_Int / 10,//
+				gf1_Decimal,//
+				lv_resistorVal,// resisor
 				lv_Vout,// Vout
 				k1,// in 100%
+				gf2_Int,//int
+				gf2_Decimal,//float
 				lv_bl_resistorVal,// resisor
 				lv_bl_Vout,// Vout
 				k2);// in 100%
