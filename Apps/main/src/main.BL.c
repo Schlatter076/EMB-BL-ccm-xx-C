@@ -480,7 +480,7 @@ int main()
 			LEDs_On(&gv_ledPeriph[0]); //马达启动
 			if (gf1 > gf2)
 			{
-				if (gf1 > 20 && k1 <= 1 && (gf1 - gf2) > 5)
+				if (gf1 > 20 && k1 <= 5 && (gf1 - gf2) > 5)
 				{
 					LEDs_On(&gv_ledPeriph[1]);
 					LEDs_Off(&gv_ledPeriph[6]);
@@ -492,7 +492,7 @@ int main()
 			}
 			else
 			{
-				if (gf2 > 20 && k2 <= 1 && (gf2 - gf1) > 5)
+				if (gf2 > 20 && k2 <= 5 && (gf2 - gf1) > 5)
 				{
 					LEDs_On(&gv_ledPeriph[6]);
 					LEDs_Off(&gv_ledPeriph[1]);
