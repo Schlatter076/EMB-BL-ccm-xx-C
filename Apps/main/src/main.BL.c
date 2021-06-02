@@ -461,7 +461,7 @@ int main()
 				lv_resistorVal,// resisor
 				lv_Vout,// Vout
 				k1,// in 100%
-				gf2_Int,//int
+				gf2_Int / 10,//int
 				gf2_Decimal,//float
 				lv_bl_resistorVal,// resisor
 				lv_bl_Vout,// Vout
