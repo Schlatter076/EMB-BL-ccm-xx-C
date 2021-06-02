@@ -396,7 +396,7 @@ int main()
 	__uTRACER_PRINTF(__TRACER_OUT, true,
 			"\n*********************************************\n");
 	__uTRACER_PRINTF(__TRACER_OUT, true,
-			"***********This is bissell program*************\n");
+			"**********This is bissell program************\n");
 	__uTRACER_PRINTF(__TRACER_OUT, true,
 			"*********************************************\n");
 
