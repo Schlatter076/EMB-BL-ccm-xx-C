@@ -359,6 +359,21 @@ float getForceBySlopeAndResistor(float slope, ksS32 resistor)
 		force = 0.0f;
 	return force;
 }
+/**
+ * @fn           将浮点数切分成整数部分和小数部分
+ * @origin       待切分浮点数
+ * @intPart      整数部分
+ * @decimalPart  小数部分
+ */
+void splitFloatWithDot(float origin, ksS32 *intPart, ksS32 *decimalPart)
+{
+	*intPart = (ksS32) (origin * 10);
+	*decimalPart = *intPart % 10;
+	if (*decimalPart < 0)
+	{
+		*decimalPart *= -1;
+	}
+}
 
 /**
  * @fn main
@@ -442,19 +457,9 @@ int main()
 		k2 = lv_BL_KineState * 100 / lv_bl_resistorVal;
 
 		gf1 = getForceBySlopeAndResistor(3.32f, lv_resistorVal);
-		gf1_Int = (ksS32) (gf1 * 10);
-		gf1_Decimal = gf1_Int % 10;
-		if (gf1_Decimal < 0)
-		{
-			gf1_Decimal = -1 * gf1_Decimal;
-		}
+		splitFloatWithDot(gf1, &gf1_Int, &gf1_Decimal);
 		gf2 = getForceBySlopeAndResistor(3.32f, lv_bl_resistorVal);
-		gf2_Int = (ksS32) (gf2 * 10);
-		gf2_Decimal = gf2_Int % 10;
-		if (gf2_Decimal < 0)
-		{
-			gf2_Decimal = -1 * gf2_Decimal;
-		}
+		splitFloatWithDot(gf2, &gf2_Int, &gf2_Decimal);
 
 		__uTRACER_PRINTF(__TRACER_OUT, true,
 				"%4d.%1d, %7d, %4d, %3d; %4d.%1d, %7d, %4d, %3d\n", //format
