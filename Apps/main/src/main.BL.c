@@ -352,7 +352,7 @@ static void bissellBufferKinestate(void)
 float getForceBySlopeAndResistor(float slope, ksS32 resistor)
 {
 	float admittance = 100000000.0f / resistor;
-	float force = (admittance - 304.3) / slope;
+	float force = admittance / slope;
 	if (force < 0)
 		force = 0.0f;
 	return force;
