@@ -509,7 +509,7 @@ int main()
 			LEDs_Off(&gv_ledPeriph[1]);
 			LEDs_Off(&gv_ledPeriph[6]);
 		}
-		ksDelayMsByLoop(100);
+		ksDelayMsByLoop(10);
 	}
 }
 
