@@ -461,15 +461,30 @@ int main()
 		gf2 = getForceBySlopeAndResistor(3.32f, lv_bl_resistorVal);
 		splitFloatWithDot(gf2, &gf2_Int, &gf2_Decimal);
 
+		/*
+		 __uTRACER_PRINTF(__TRACER_OUT, true,
+		 "%4d.%1d, %7d, %4d, %3d; %4d.%1d, %7d, %4d, %3d\n", //format
+		 gf1_Int / 10,//
+		 gf1_Decimal,//
+		 lv_resistorVal,// resisor
+		 lv_Vout,// Vout
+		 k1,// in 100%
+		 gf2_Int / 10,//int
+		 gf2_Decimal,//float
+		 lv_bl_resistorVal,// resisor
+		 lv_bl_Vout,// Vout
+		 k2);// in 100%
+
+		 //*/
 		__uTRACER_PRINTF(__TRACER_OUT, true,
-				"%4d.%1d, %7d, %4d, %3d; %4d.%1d, %7d, %4d, %3d\n", //format
+				"%4d.%1d, %7d, %4d, %3d, %4d.%1d, %7d, %4d, %3d\n", //format
 				gf1_Int / 10,//
 				gf1_Decimal,//
 				lv_resistorVal,// resisor
 				lv_Vout,// Vout
-				k1,// in 100%
-				gf2_Int / 10,//int
-				gf2_Decimal,//float
+				k1, //
+				gf2_Int / 10, //
+				gf2_Decimal,//
 				lv_bl_resistorVal,// resisor
 				lv_bl_Vout,// Vout
 				k2);// in 100%
