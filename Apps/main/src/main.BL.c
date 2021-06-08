@@ -444,17 +444,17 @@ int main()
 		thorBufferKinestate();
 		bissellBufferKinestate();
 
-		if (lv_resistorVal == 0)
+		if ((lv_resistorVal <= 0)||(lv_resistorVal >= 10000000))
 		{
 			lv_resistorVal = 1;
 		}
-		if (lv_bl_resistorVal == 0)
+		if ((lv_bl_resistorVal <= 0)||(lv_bl_resistorVal >= 10000000))
 		{
 			lv_bl_resistorVal = 1;
 		}
 
-		k1 = lv_THOR_KineState * 100 / lv_resistorVal;
-		k2 = lv_BL_KineState * 100 / lv_bl_resistorVal;
+		k1 = lv_THOR_KineState * 200 / lv_resistorVal;
+		k2 = lv_BL_KineState * 200 / lv_bl_resistorVal;
 
 		gf1 = getForceBySlopeAndResistor(3.32f, lv_resistorVal);
 		splitFloatWithDot(gf1, &gf1_Int, &gf1_Decimal);
