@@ -374,6 +374,18 @@ void splitFloatWithDot(float origin, ksS32 *intPart, ksS32 *decimalPart)
 		*decimalPart *= -1;
 	}
 }
+/**
+ * @fn
+ */
+void caculateVoutAndResistor(ksS32 *filteredADC, ksS16 adcVal, ksS32 *Vout,
+		ksS32 *resistorVal, ksS32 *resistorValPrev)
+{
+	*filteredADC = rcFilter(adcVal, *filteredADC, 5);
+	*Vout = *filteredADC * __REF_VOLTAGE / 4096;
+
+	*resistorValPrev = *resistorVal;
+	*resistorVal = (__SUPPLY_VOLTAGE - *Vout) * __DIVIDOR_RESISTOR / *Vout;
+}
 
 /**
  * @fn main
@@ -423,32 +435,19 @@ int main()
 	while (true)
 	{
 		tm30AdcDoSampleing(&gv_tm30TestAdc);
-		// calculation
-		lv_filteredADC = rcFilter(gv_tm30TestAdc.adcBuf[0], lv_filteredADC, 5);
-		lv_Vout = lv_filteredADC * __REF_VOLTAGE / 4096;
-
-		lv_resistorValPrev = lv_resistorVal;
-		lv_resistorVal = (__SUPPLY_VOLTAGE - lv_Vout) * __DIVIDOR_RESISTOR
-				/ lv_Vout;
-
+		caculateVoutAndResistor(&lv_filteredADC, gv_tm30TestAdc.adcBuf[0],
+				&lv_Vout, &lv_resistorVal, &lv_resistorValPrev);
 		tm30AdcDoSampleing(&gv_tm30TestAdc);
-
-		lv_bl_filteredADC = rcFilter(gv_tm30TestAdc.adcBuf[0],
-				lv_bl_filteredADC, 5);
-		lv_bl_Vout = lv_bl_filteredADC * __REF_VOLTAGE / 4096;
-
-		lv_bl_resistorValPrev = lv_bl_resistorVal;
-		lv_bl_resistorVal = (__SUPPLY_VOLTAGE - lv_bl_Vout) * __DIVIDOR_RESISTOR
-				/ lv_bl_Vout;
-
+		caculateVoutAndResistor(&lv_bl_filteredADC, gv_tm30TestAdc.adcBuf[0],
+				&lv_bl_Vout, &lv_bl_resistorVal, &lv_bl_resistorValPrev);
 		thorBufferKinestate();
 		bissellBufferKinestate();
 
-		if ((lv_resistorVal <= 0)||(lv_resistorVal >= 10000000))
+		if ((lv_resistorVal <= 0) || (lv_resistorVal >= 10000000))
 		{
 			lv_resistorVal = 1;
 		}
-		if ((lv_bl_resistorVal <= 0)||(lv_bl_resistorVal >= 10000000))
+		if ((lv_bl_resistorVal <= 0) || (lv_bl_resistorVal >= 10000000))
 		{
 			lv_bl_resistorVal = 1;
 		}
@@ -461,29 +460,14 @@ int main()
 		gf2 = getForceBySlopeAndResistor(3.32f, lv_bl_resistorVal);
 		splitFloatWithDot(gf2, &gf2_Int, &gf2_Decimal);
 
-		/*
-		 __uTRACER_PRINTF(__TRACER_OUT, true,
-		 "%4d.%1d, %7d, %4d, %3d; %4d.%1d, %7d, %4d, %3d\n", //format
-		 gf1_Int / 10,//
-		 gf1_Decimal,//
-		 lv_resistorVal,// resisor
-		 lv_Vout,// Vout
-		 k1,// in 100%
-		 gf2_Int / 10,//int
-		 gf2_Decimal,//float
-		 lv_bl_resistorVal,// resisor
-		 lv_bl_Vout,// Vout
-		 k2);// in 100%
-
-		 //*/
 		__uTRACER_PRINTF(__TRACER_OUT, true,
 				"%4d.%1d, %7d, %4d, %3d, %4d.%1d, %7d, %4d, %3d\n", //format
 				gf1_Int / 10,//
 				gf1_Decimal,//
 				lv_resistorVal,// resisor
 				lv_Vout,// Vout
-				k1, //
-				gf2_Int / 10, //
+				k1,//
+				gf2_Int / 10,//
 				gf2_Decimal,//
 				lv_bl_resistorVal,// resisor
 				lv_bl_Vout,// Vout
