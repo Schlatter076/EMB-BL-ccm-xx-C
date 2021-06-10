@@ -29,10 +29,10 @@
 
 
 #define   _STABLED_THRESHOLD   5
-#define   _FRONT_SLOPE         3.2f
+#define   _FRONT_SLOPE         2.65f
 #define   _FRONR_FACTOR        5
-#define   _BACK_FACTOR         8
-#define   _BACK_SLOPE          6.2f
+#define   _BACK_FACTOR         5
+#define   _BACK_SLOPE          4.2f
 #define   _MIN_TRIGGER_F       50
 #define   _MIN_DIFF_F          50
 
@@ -366,6 +366,7 @@ float getForceBySlopeAndResistor(float slope, ksS32 resistor)
 		return 0.0f;
 	float admittance = 100000000.0f / resistor;
 	float force = admittance / slope;
+	//float force = (admittance + 727777) / 180.04;
 	if (force < 0)
 		force = 0.0f;
 	return force;
@@ -415,6 +416,10 @@ void modifyLEDStatus(float gf1, ksU16 k1, float gf2, ksU16 k2)
 			else
 			{
 				LEDs_Off(&gv_ledPeriph[1]);
+				if (duty > 0)
+				{
+					duty--;
+				}
 			}
 		}
 		else
@@ -428,8 +433,22 @@ void modifyLEDStatus(float gf1, ksU16 k1, float gf2, ksU16 k2)
 			else
 			{
 				LEDs_Off(&gv_ledPeriph[6]);
+				if (duty > 0)
+				{
+					duty--;
+				}
 			}
 		}
+		if (abs_Force > abs_ForcePre && duty < 20)
+		{
+
+			duty++;
+		}
+		else if (duty > 0)
+		{
+			//duty--;
+		}
+		abs_ForcePre = abs_Force;
 	}
 	else
 	{
@@ -440,16 +459,7 @@ void modifyLEDStatus(float gf1, ksU16 k1, float gf2, ksU16 k2)
 	}
 	//duty = abs_Force % 20;
 
-	if (abs_Force > abs_ForcePre && duty < 20)
-	{
 
-		duty++;
-	}
-	else if (duty > 0)
-	{
-		duty--;
-	}
-	abs_ForcePre = abs_Force;
 	//*/
 }
 
@@ -533,7 +543,7 @@ int main()
 			lv_bl_resistorVal = 1;
 		}
 
-		k1 = lv_THOR_KineState * 200 / lv_resistorVal;
+		k1 = lv_THOR_KineState * 100 / lv_resistorVal;
 		k2 = lv_BL_KineState * 800 / lv_bl_resistorVal;
 
 		gf1 = getForceBySlopeAndResistor(_FRONT_SLOPE, lv_resistorVal);
