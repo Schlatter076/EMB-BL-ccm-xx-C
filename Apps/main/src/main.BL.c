@@ -25,6 +25,17 @@
 #include <Tracer.h>
 #include "../../main/inc/tm30.test.adc.h"
 #include "../../callbacks/inc/tsTracerRxCallBacks.h"
+#include "../../main/inc/bissell.test.timer.h"
+
+
+#define   _STABLED_THRESHOLD   5
+#define   _FRONT_SLOPE         3.2f
+#define   _FRONR_FACTOR        5
+#define   _BACK_FACTOR         8
+#define   _BACK_SLOPE          6.2f
+#define   _MIN_TRIGGER_F       50
+#define   _MIN_DIFF_F          50
+
 
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
@@ -378,15 +389,84 @@ void splitFloatWithDot(float origin, ksS32 *intPart, ksS32 *decimalPart)
  * @fn
  */
 void caculateVoutAndResistor(ksS32 *filteredADC, ksS16 adcVal, ksS32 *Vout,
-		ksS32 *resistorVal, ksS32 *resistorValPrev)
+		ksS32 *resistorVal, ksS32 *resistorValPrev, ksS32 factor)
 {
-	*filteredADC = rcFilter(adcVal, *filteredADC, 5);
+	*filteredADC = rcFilter(adcVal, *filteredADC, factor);
 	*Vout = *filteredADC * __REF_VOLTAGE / 4096;
 
 	*resistorValPrev = *resistorVal;
 	*resistorVal = (__SUPPLY_VOLTAGE - *Vout) * __DIVIDOR_RESISTOR / *Vout;
 }
 
+void modifyLEDStatus(float gf1, ksU16 k1, float gf2, ksU16 k2)
+{
+	ksU32 abs_Force = 0;
+	static ksU32 abs_ForcePre = 0;
+	if (gf1 > _MIN_DIFF_F || gf2 > _MIN_DIFF_F)
+	{
+		if (gf1 > gf2)
+		{
+			abs_Force = gf1 - gf2;
+			if (gf1 > _MIN_DIFF_F && k1 <= _STABLED_THRESHOLD && abs_Force > _MIN_DIFF_F)
+			{
+				LEDs_On(&gv_ledPeriph[1]);
+				LEDs_Off(&gv_ledPeriph[6]);
+			}
+			else
+			{
+				LEDs_Off(&gv_ledPeriph[1]);
+			}
+		}
+		else
+		{
+			abs_Force = gf2 - gf1;
+			if (gf2 > _MIN_DIFF_F && k2 <= _STABLED_THRESHOLD && abs_Force > _MIN_DIFF_F)
+			{
+				LEDs_On(&gv_ledPeriph[6]);
+				LEDs_Off(&gv_ledPeriph[1]);
+			}
+			else
+			{
+				LEDs_Off(&gv_ledPeriph[6]);
+			}
+		}
+	}
+	else
+	{
+		duty = 0;
+		abs_ForcePre = 0;
+		LEDs_Off(&gv_ledPeriph[1]);
+		LEDs_Off(&gv_ledPeriph[6]);
+	}
+	//duty = abs_Force % 20;
+
+	if (abs_Force > abs_ForcePre && duty < 20)
+	{
+
+		duty++;
+	}
+	else if (duty > 0)
+	{
+		duty--;
+	}
+	abs_ForcePre = abs_Force;
+	//*/
+}
+
+void bissell_timer0_callback(void)
+{
+	static ksU32 cnt = 0;
+	cnt++;
+	if (cnt % 20 < duty)
+	{
+		LEDs_On(&gv_ledPeriph[0]);
+	}
+	else
+	{
+		LEDs_Off(&gv_ledPeriph[0]);
+	}
+	TIMx_ClrFlag(&blTimer, NRF_TIMER_CC_CHANNEL0);
+}
 /**
  * @fn main
  * @return
@@ -401,6 +481,7 @@ int main()
 	ksS32 gf2_Int = 0;
 	ksS32 gf2_Decimal = 0;
 	mcuBSPInit(aiDeBaoReturnRecvISR);
+	bissell_timer_Init(&blTimer, 800, bissell_timer0_callback);
 
 	uTracer[__UTRACER_IDX_1].pUsart->gpio[_KS_USART_IO_TXD].Pin.pinNum =
 			(ksGPIO_PIN_e) __PIN_TO_PC;
@@ -436,10 +517,10 @@ int main()
 	{
 		tm30AdcDoSampleing(&gv_tm30TestAdc);
 		caculateVoutAndResistor(&lv_filteredADC, gv_tm30TestAdc.adcBuf[0],
-				&lv_Vout, &lv_resistorVal, &lv_resistorValPrev);
+				&lv_Vout, &lv_resistorVal, &lv_resistorValPrev, _FRONR_FACTOR);
 		tm30AdcDoSampleing(&gv_tm30TestAdc);
 		caculateVoutAndResistor(&lv_bl_filteredADC, gv_tm30TestAdc.adcBuf[0],
-				&lv_bl_Vout, &lv_bl_resistorVal, &lv_bl_resistorValPrev);
+				&lv_bl_Vout, &lv_bl_resistorVal, &lv_bl_resistorValPrev, _BACK_FACTOR);
 		thorBufferKinestate();
 		bissellBufferKinestate();
 
@@ -453,11 +534,11 @@ int main()
 		}
 
 		k1 = lv_THOR_KineState * 200 / lv_resistorVal;
-		k2 = lv_BL_KineState * 200 / lv_bl_resistorVal;
+		k2 = lv_BL_KineState * 800 / lv_bl_resistorVal;
 
-		gf1 = getForceBySlopeAndResistor(3.32f, lv_resistorVal);
+		gf1 = getForceBySlopeAndResistor(_FRONT_SLOPE, lv_resistorVal);
 		splitFloatWithDot(gf1, &gf1_Int, &gf1_Decimal);
-		gf2 = getForceBySlopeAndResistor(3.32f, lv_bl_resistorVal);
+		gf2 = getForceBySlopeAndResistor(_BACK_SLOPE, lv_bl_resistorVal);
 		splitFloatWithDot(gf2, &gf2_Int, &gf2_Decimal);
 
 		__uTRACER_PRINTF(__TRACER_OUT, true,
@@ -473,41 +554,7 @@ int main()
 				lv_bl_Vout,// Vout
 				k2);// in 100%
 
-		//*/
-		if (gf1 > 20 || gf2 > 20)
-		{
-			LEDs_On(&gv_ledPeriph[0]); //马达启动
-			if (gf1 > gf2)
-			{
-				if (gf1 > 20 && k1 <= 5 && (gf1 - gf2) > 5)
-				{
-					LEDs_On(&gv_ledPeriph[1]);
-					LEDs_Off(&gv_ledPeriph[6]);
-				}
-				else
-				{
-					LEDs_Off(&gv_ledPeriph[1]);
-				}
-			}
-			else
-			{
-				if (gf2 > 20 && k2 <= 5 && (gf2 - gf1) > 5)
-				{
-					LEDs_On(&gv_ledPeriph[6]);
-					LEDs_Off(&gv_ledPeriph[1]);
-				}
-				else
-				{
-					LEDs_Off(&gv_ledPeriph[6]);
-				}
-			}
-		}
-		else
-		{
-			LEDs_Off(&gv_ledPeriph[0]);
-			LEDs_Off(&gv_ledPeriph[1]);
-			LEDs_Off(&gv_ledPeriph[6]);
-		}
+		modifyLEDStatus(gf1, k1, gf2, k2);
 		ksDelayMsByLoop(10);
 	}
 }
