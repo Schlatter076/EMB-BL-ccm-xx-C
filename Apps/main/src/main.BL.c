@@ -29,13 +29,13 @@
 
 
 #define   _STABLED_THRESHOLD   5
-#define   _FRONT_SLOPE         2.65f
+#define   _FRONT_SLOPE         3.32f
 #define   _FRONR_FACTOR        5
 #define   _BACK_FACTOR         5
-#define   _BACK_SLOPE          4.2f
+#define   _BACK_SLOPE          4.0f
 #define   _MIN_TRIGGER_F       50
 #define   _MIN_DIFF_F          50
-#define   _GEAR_MIDDLE         800
+#define   _GEAR_MIDDLE         730
 
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
@@ -546,7 +546,7 @@ int main()
 		}
 
 		k1 = lv_THOR_KineState * 100 / lv_resistorVal;
-		k2 = lv_BL_KineState * 800 / lv_bl_resistorVal;
+		k2 = lv_BL_KineState * 200 / lv_bl_resistorVal;
 
 		gf1 = getForceBySlopeAndResistor(_FRONT_SLOPE, lv_resistorVal);
 		splitFloatWithDot(gf1, &gf1_Int, &gf1_Decimal);
