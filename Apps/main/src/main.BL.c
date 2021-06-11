@@ -36,7 +36,6 @@
 #define   _MIN_TRIGGER_F       50
 #define   _MIN_DIFF_F          50
 #define   _GEAR_MIDDLE         800
-#define   _GEAR_HIGH           1000
 
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
@@ -404,13 +403,13 @@ void modifyLEDStatus(float gf1, ksU16 k1, float gf2, ksU16 k2)
 {
 	ksU32 abs_Force = 0;
 	static ksU32 abs_ForcePre = 0;
-	if ((gf1 >= _MIN_DIFF_F && gf1 <= _GEAR_MIDDLE && gf2 <= _GEAR_MIDDLE)
-			|| (gf2 >= _MIN_DIFF_F && gf2 <= _GEAR_MIDDLE && gf1 <= _GEAR_MIDDLE))
+	if ((gf1 >= _MIN_TRIGGER_F && gf1 <= _GEAR_MIDDLE && gf2 <= _GEAR_MIDDLE)
+			|| (gf2 >= _MIN_TRIGGER_F && gf2 <= _GEAR_MIDDLE && gf1 <= _GEAR_MIDDLE))
 	{
 		if (gf1 > gf2)
 		{
 			abs_Force = gf1 - gf2;
-			if (gf1 > _MIN_DIFF_F && k1 <= _STABLED_THRESHOLD
+			if (gf1 > _MIN_TRIGGER_F && k1 <= _STABLED_THRESHOLD
 					&& abs_Force > _MIN_DIFF_F)
 			{
 				LEDs_On(&gv_ledPeriph[1]);
@@ -428,7 +427,7 @@ void modifyLEDStatus(float gf1, ksU16 k1, float gf2, ksU16 k2)
 		else
 		{
 			abs_Force = gf2 - gf1;
-			if (gf2 > _MIN_DIFF_F && k2 <= _STABLED_THRESHOLD && abs_Force > _MIN_DIFF_F)
+			if (gf2 > _MIN_TRIGGER_F && k2 <= _STABLED_THRESHOLD && abs_Force > _MIN_DIFF_F)
 			{
 				LEDs_On(&gv_ledPeriph[6]);
 				LEDs_Off(&gv_ledPeriph[1]);
