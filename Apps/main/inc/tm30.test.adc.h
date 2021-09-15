@@ -25,7 +25,7 @@ extern "C"
 /**** Includes ****************************************************************/
 #include  <ksPeriph.h>
 
-#define   __TM30_ADC_TEST_SENSOR_CNTR         (0x01)
+#define   __TM30_ADC_TEST_SENSOR_CNTR         (0x02)
 #define   __TM30_ADC_AMPMAX_LIMIT_Upper       (325)
 #define   __TM30_ADC_AMPMAX_LIMIT_Lower       /* (305) // */ (300)
 #define   __TM30_ADC_AMPMIN_LIMIT_Upper       (25)

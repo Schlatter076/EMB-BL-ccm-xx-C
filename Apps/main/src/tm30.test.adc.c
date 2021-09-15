@@ -44,8 +44,8 @@ tm30AdcTest_t gv_tm30TestAdc =
       .mode       = ADC_Mode_Single,
       .chn        =
       {
-        {ADC_Ch03, ADC_ChNo},  // 0x00, 0x02 are tested
-        {ADC_Ch02, ADC_ChNo},
+        {ADC_Ch02, ADC_ChNo},  // 0x00, 0x02 are tested
+        {ADC_Ch03, ADC_ChNo},
         {ADC_ChNo, ADC_ChNo},
         {ADC_ChNo, ADC_ChNo},
       },
@@ -177,7 +177,7 @@ void tm30AdcDoSampleing (tm30AdcTest_t  *pTestADC)
   ksAdcStart(&pTestADC->adc);
   ksAdcSample(&pTestADC->adc);
 
-  while(pTestADC->adcSem < 0x01)
+  while(pTestADC->adcSem < __TM30_ADC_TEST_SENSOR_CNTR)
   {
     asm("nop"); // sleep
   }
