@@ -18,6 +18,8 @@
 #define   __SUPPLY_VOLTAGE      3286  // mv
 #define   __REF_VOLTAGE         /* 3600 // */ 3560  // mv
 #define   __SAMPLE_CNTR         2
+/******************************************************************************/
+
 /***** Data type **************************************************************/
 typedef struct
 {
@@ -46,5 +48,7 @@ float getForceBySlopeAndResistor(float slope, ksS32 resistor);
 void splitFloatWithDot(float origin, ksS32 *intPart, ksS32 *decimalPart);
 void caculateVoutAndResistor(SensorSample_t *sample, ksS16 adcVal, ksS32 factor, ksU16 k_times);
 void Init_sample(void);
+ksU32 GetMedianNum(ksU32 *bArray, int iFilterLen);
+ksU32 GetWidthNum(ksU32 newVal, ksU32 *oldVal, ksU08 width);
 
 #endif /* APPS_MAIN_INC_SENSOR_SAMPLE_TYPE_H_ */

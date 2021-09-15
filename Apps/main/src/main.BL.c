@@ -27,6 +27,7 @@
 #include "../../callbacks/inc/tsTracerRxCallBacks.h"
 #include "../../main/inc/bissell.test.timer.h"
 #include "../../main/inc/sensor.sample.type.h"
+#include "../../main/inc/nrf52832.flash.h"
 
 #define   _STABLED_THRESHOLD   5
 #define   _FRONT_SLOPE         3.32f
@@ -284,12 +285,17 @@ void bissell_timer0_callback(void)
   }
   TIMx_ClrFlag(&blTimer, NRF_TIMER_CC_CHANNEL0);
 }
+
+ksU32 admBuf[10];
+ksU32 midAdm = 0;
+ksU32 midAdmOld = 0;
 /**
  * @fn main
  * @return
  */
 int main()
 {
+  ksU32 calVal = 0;
   mcuBSPInit(aiDeBaoReturnRecvISR);
   bissell_timer_Init(&blTimer, 800, bissell_timer0_callback);
   Init_sample();
@@ -309,18 +315,38 @@ int main()
 
   while (true)
   {
-    tm30AdcDoSampleing(&gv_tm30TestAdc);
-    caculateVoutAndResistor(&sensorSamples[0], gv_tm30TestAdc.adcBuf[0], 5, 800);
-    caculateVoutAndResistor(&sensorSamples[1], gv_tm30TestAdc.adcBuf[1], 5, 800);
-    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d\n", //format
+    for(int i = 0; i < 10; i++)
+    {
+      tm30AdcDoSampleing(&gv_tm30TestAdc);
+      caculateVoutAndResistor(&sensorSamples[0], gv_tm30TestAdc.adcBuf[0], 5, 800);
+      caculateVoutAndResistor(&sensorSamples[1], gv_tm30TestAdc.adcBuf[1], 5, 800);
+      admBuf[i] = sensorSamples[0].admVal;
+      ksDelayMsByLoop(1);
+    }
+
+    //midAdm = GetMedianNum(admBuf, 10);
+    midAdm = GetWidthNum(GetMedianNum(admBuf, 10), &midAdmOld, 10);
+    if(_tracer_Recved == uTracer[__UTRACER_IDX_1].rxBuf.status)
+    {
+      if(uTracer[__UTRACER_IDX_1].rxBuf.buf[0x03] == 0x76)
+      {
+        writeCalVal((ksU32)((uTracer[__UTRACER_IDX_1].rxBuf.buf[0x04] << 8) | uTracer[__UTRACER_IDX_1].rxBuf.buf[0x05]));
+        deInitUtracerRxBuf();
+      }
+    }
+    calVal = readCalVal();
+
+    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d\n", //format
         sensorSamples[0].filteredADC,  //
         sensorSamples[0].resistorVal,  //
-        sensorSamples[0].admVal,  //
+        // sensorSamples[0].admVal,  //
+        midAdm,  //
         sensorSamples[1].filteredADC,  //
         sensorSamples[1].resistorVal,  //
-        sensorSamples[1].admVal); // in 100%
+        sensorSamples[1].admVal,  //
+        calVal); // in 100%
 
-    ksDelayMsByLoop(10);
+    //ksDelayMsByLoop(10);
   }
 }
 

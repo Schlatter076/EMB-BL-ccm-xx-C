@@ -170,3 +170,52 @@ void caculateVoutAndResistor(SensorSample_t *sample, ksS16 adcVal, ksS32 factor,
 	BufferKinestate(sample);
 	sample->K = sample->KineState * k_times / sample->resistorVal;
 }
+
+/**
+ * 幅度滤波
+ */
+ksU32 GetWidthNum(ksU32 newVal, ksU32 *oldVal, ksU08 width)
+{
+  ksU32 delta = GetAbsVal(newVal, *oldVal);
+  if(delta <= width)
+  {
+    return *oldVal;
+  }
+  *oldVal = newVal;
+  return newVal;
+}
+/**
+ * 中值滤波
+ */
+ksU32 GetMedianNum(ksU32 *bArray, int iFilterLen)
+{
+  int i,j;// 循环变量
+  ksU32 bTemp;
+  // 用冒泡法对数组进行排序
+  for (j = 0; j < iFilterLen - 1; j ++)
+  {
+    for (i = 0; i < iFilterLen - j - 1; i ++)
+    {
+      if (bArray[i] > bArray[i + 1])
+      {
+        // 互换
+        bTemp = bArray[i];
+        bArray[i] = bArray[i + 1];
+        bArray[i + 1] = bTemp;
+      }
+    }
+  }
+  // 计算中值
+  if ((iFilterLen & 1) > 0)
+  {
+    // 数组有奇数个元素，返回中间一个元素
+    bTemp = bArray[(iFilterLen + 1) / 2];
+  }
+  else
+  {
+    // 数组有偶数个元素，返回中间两个元素平均值
+    bTemp = (bArray[iFilterLen / 2] + bArray[iFilterLen / 2 + 1]) / 2;
+  }
+  return bTemp;
+}
+
