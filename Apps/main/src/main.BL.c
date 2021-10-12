@@ -28,6 +28,7 @@
 #include "../../main/inc/bissell.test.timer.h"
 #include "../../main/inc/sensor.sample.type.h"
 #include "../../main/inc/nrf52832.flash.h"
+#include "../inc/bissell.clutch.driver.h"
 
 #define   _STABLED_THRESHOLD   5
 #define   _FRONT_SLOPE         3.32f
@@ -37,6 +38,8 @@
 #define   _MIN_TRIGGER_F       50
 #define   _MIN_DIFF_F          50
 #define   _GEAR_MIDDLE         730
+
+#define   _FRONT_THRESHOLD     (500)
 
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
@@ -286,9 +289,28 @@ void bissell_timer0_callback(void)
   TIMx_ClrFlag(&blTimer, NRF_TIMER_CC_CHANNEL0);
 }
 
-ksU32 admBuf[10];
-ksU32 midAdm = 0;
-ksU32 midAdmOld = 0;
+ksS32 lv_admBuf_front[10];
+ksS32 lv_midAdm_front = 0;
+ksS32 lv_midAdmOld_front = 0;
+ksS32 lv_admOld_front = 0;
+ksS32 lv_deltaAdm_front = 0;
+
+void pressureFilter_front(void)
+{
+  if((lv_midAdm_front - lv_admOld_front) > _FRONT_THRESHOLD)
+  {
+    lv_deltaAdm_front = _FRONT_THRESHOLD;
+    lv_admOld_front = lv_midAdm_front;
+    __RELAY_1_HIGH;
+  }
+  else if((lv_midAdm_front - lv_admOld_front) < -0.7 * _FRONT_THRESHOLD)
+  {
+    lv_deltaAdm_front = -1 * _FRONT_THRESHOLD;
+    lv_admOld_front = lv_midAdm_front;
+    __RELAY_1_LOW;
+  }
+}
+
 /**
  * @fn main
  * @return
@@ -297,9 +319,11 @@ int main()
 {
   ksU32 calVal = 0;
   mcuBSPInit(aiDeBaoReturnRecvISR);
-  bissell_timer_Init(&blTimer, 800, bissell_timer0_callback);
+  //bissell_timer_Init(&blTimer, 800, bissell_timer0_callback);
   Init_sample();
   tm30AdcTestInit(&gv_tm30TestAdc, _ISR_ADC_DONE, tm30AdcTestCallBack);
+
+  Init_Clutch_Driver();
 
   uTracer[__UTRACER_IDX_1].pUsart->gpio[_KS_USART_IO_TXD].Pin.pinNum = (ksGPIO_PIN_e) __PIN_TO_PC;
   ksGpioInit(&uTracer[__UTRACER_IDX_1].pUsart->gpio[_KS_USART_IO_TXD]);
@@ -313,6 +337,7 @@ int main()
   __uTRACER_PRINTF(__TRACER_OUT, true, "*********************************************\n");
 
 
+
   while (true)
   {
     for(int i = 0; i < 10; i++)
@@ -320,12 +345,12 @@ int main()
       tm30AdcDoSampleing(&gv_tm30TestAdc);
       caculateVoutAndResistor(&sensorSamples[0], gv_tm30TestAdc.adcBuf[0], 5, 800);
       caculateVoutAndResistor(&sensorSamples[1], gv_tm30TestAdc.adcBuf[1], 5, 800);
-      admBuf[i] = sensorSamples[0].admVal;
-      ksDelayMsByLoop(1);
+      lv_admBuf_front[i] = sensorSamples[0].admVal;
+      nrf_delay_ms(1);
     }
 
-    //midAdm = GetMedianNum(admBuf, 10);
-    midAdm = GetWidthNum(GetMedianNum(admBuf, 10), &midAdmOld, 10);
+    lv_midAdm_front = GetWidthNum(GetMedianNum(lv_admBuf_front, 10), &lv_midAdmOld_front, 10);
+    pressureFilter_front();
     if(_tracer_Recved == uTracer[__UTRACER_IDX_1].rxBuf.status)
     {
       if(uTracer[__UTRACER_IDX_1].rxBuf.buf[0x03] == 0x76)
@@ -336,17 +361,25 @@ int main()
     }
     calVal = readCalVal();
 
-    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d\n", //format
+    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n", //format
         sensorSamples[0].filteredADC,  //
         sensorSamples[0].resistorVal,  //
         // sensorSamples[0].admVal,  //
-        midAdm,  //
+        lv_midAdm_front,  //
+        lv_deltaAdm_front, //
+        lv_admOld_front, //
         sensorSamples[1].filteredADC,  //
         sensorSamples[1].resistorVal,  //
         sensorSamples[1].admVal,  //
         calVal); // in 100%
 
     //ksDelayMsByLoop(10);
+//    __RELAY_1_HIGH;
+//    __RELAY_2_HIGH;
+//    ksDelayMsByLoop(1000);
+//    __RELAY_1_LOW;
+//    __RELAY_2_LOW;
+//    ksDelayMsByLoop(1000);
   }
 }
 
