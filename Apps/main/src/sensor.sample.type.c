@@ -9,6 +9,23 @@
 
 SensorSample_t sensorSamples[__SAMPLE_CNTR];
 
+SensorFilter_t sensorFrontFilter =
+{
+    .admBuf = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    .midAdm = 0,
+    .midAdmOld = 0,
+    .admOld = 0,
+    .deltaAdm = 0
+};
+SensorFilter_t sensorBottomFilter =
+{
+    .admBuf = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    .midAdm = 0,
+    .midAdmOld = 0,
+    .admOld = 0,
+    .deltaAdm = 0
+};
+
 void Init_sample(void)
 {
 	for(int i = 0; i < __SAMPLE_CNTR; i++)

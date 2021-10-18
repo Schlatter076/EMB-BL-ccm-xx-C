@@ -39,6 +39,18 @@ typedef struct
 	ksS32   gF_Decimal;
 }SensorSample_t;
 
+typedef struct
+{
+  ksS32 admBuf[10];
+  ksS32 midAdm;
+  ksS32 midAdmOld;
+  ksS32 admOld;
+  ksS32 deltaAdm;
+}SensorFilter_t;
+
+
+extern SensorFilter_t sensorFrontFilter;
+extern SensorFilter_t sensorBottomFilter;
 extern SensorSample_t sensorSamples[__SAMPLE_CNTR];
 
 /******************************************************************************/
