@@ -39,7 +39,8 @@
 #define   _MIN_DIFF_F          50
 #define   _GEAR_MIDDLE         730
 
-#define   _FRONT_THRESHOLD     (500)
+#define   _FRONT_THRESHOLD     (600)
+#define   _BOTTOM_THRESHOLD    (300)
 
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
@@ -289,25 +290,55 @@ void bissell_timer0_callback(void)
   TIMx_ClrFlag(&blTimer, NRF_TIMER_CC_CHANNEL0);
 }
 
-ksS32 lv_admBuf_front[10];
-ksS32 lv_midAdm_front = 0;
-ksS32 lv_midAdmOld_front = 0;
-ksS32 lv_admOld_front = 0;
-ksS32 lv_deltaAdm_front = 0;
-
-void pressureFilter_front(void)
+void pressureFilter(SensorFilter_t *filter, ksS32 threshold)
 {
-  if((lv_midAdm_front - lv_admOld_front) > _FRONT_THRESHOLD)
+  if((filter->midAdm - filter->admOld) > threshold)
   {
-    lv_deltaAdm_front = _FRONT_THRESHOLD;
-    lv_admOld_front = lv_midAdm_front;
-    __RELAY_1_HIGH;
+    filter->deltaAdm = threshold;
+    filter->admOld = filter->midAdm;
   }
-  else if((lv_midAdm_front - lv_admOld_front) < -0.7 * _FRONT_THRESHOLD)
+  else if((filter->midAdm - filter->admOld) < -0.5 * threshold)
   {
-    lv_deltaAdm_front = -1 * _FRONT_THRESHOLD;
-    lv_admOld_front = lv_midAdm_front;
+    filter->deltaAdm = -1 * threshold;
+    filter->admOld = filter->midAdm;
+  }
+}
+
+void pressureInit(void)
+{
+  static bool flag = true;
+  static ksU08 cntr = 0;
+  if(flag)
+  {
+    if(cntr++ >= 20)
+    {
+      flag = false;
+    }
+    sensorFrontFilter.midAdmOld = sensorFrontFilter.midAdm;
+    sensorFrontFilter.deltaAdm = 0;
+    sensorFrontFilter.admOld = sensorFrontFilter.midAdm;
+    sensorBottomFilter.midAdmOld = sensorBottomFilter.midAdm;
+    sensorBottomFilter.deltaAdm = 0;
+    sensorBottomFilter.admOld = sensorBottomFilter.midAdm;
+  }
+}
+
+void clutchSwitch(void)
+{
+  if(sensorFrontFilter.deltaAdm == _FRONT_THRESHOLD)
+  {
+    __RELAY_1_HIGH;
+    __RELAY_2_LOW;
+  }
+  else if(sensorBottomFilter.deltaAdm == _BOTTOM_THRESHOLD && sensorFrontFilter.deltaAdm == -1 * _FRONT_THRESHOLD)
+  {
+    __RELAY_2_HIGH;
     __RELAY_1_LOW;
+  }
+  else
+  {
+    __RELAY_1_LOW;
+    __RELAY_2_LOW;
   }
 }
 
@@ -345,12 +376,16 @@ int main()
       tm30AdcDoSampleing(&gv_tm30TestAdc);
       caculateVoutAndResistor(&sensorSamples[0], gv_tm30TestAdc.adcBuf[0], 5, 800);
       caculateVoutAndResistor(&sensorSamples[1], gv_tm30TestAdc.adcBuf[1], 5, 800);
-      lv_admBuf_front[i] = sensorSamples[0].admVal;
+      sensorFrontFilter.admBuf[i] = sensorSamples[0].admVal;
+      sensorBottomFilter.admBuf[i] = sensorSamples[1].admVal;
       nrf_delay_ms(1);
     }
 
-    lv_midAdm_front = GetWidthNum(GetMedianNum(lv_admBuf_front, 10), &lv_midAdmOld_front, 10);
-    pressureFilter_front();
+    sensorFrontFilter.midAdm = GetWidthNum(GetMedianNum(sensorFrontFilter.admBuf, 10), &sensorFrontFilter.midAdmOld, 10);
+    sensorBottomFilter.midAdm = GetWidthNum(GetMedianNum(sensorBottomFilter.admBuf, 10), &sensorBottomFilter.midAdmOld, 10);
+    pressureFilter(&sensorFrontFilter, _FRONT_THRESHOLD);
+    pressureFilter(&sensorBottomFilter, _BOTTOM_THRESHOLD);
+    pressureInit();
     if(_tracer_Recved == uTracer[__UTRACER_IDX_1].rxBuf.status)
     {
       if(uTracer[__UTRACER_IDX_1].rxBuf.buf[0x03] == 0x76)
@@ -360,17 +395,18 @@ int main()
       }
     }
     calVal = readCalVal();
-
-    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n", //format
+    clutchSwitch();
+    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d\n", //format
         sensorSamples[0].filteredADC,  //
-        sensorSamples[0].resistorVal,  //
-        // sensorSamples[0].admVal,  //
-        lv_midAdm_front,  //
-        lv_deltaAdm_front, //
-        lv_admOld_front, //
+        //sensorSamples[0].resistorVal,  //
+        sensorFrontFilter.midAdm,  //
+        sensorFrontFilter.deltaAdm, //
+        //sensorFrontFilter.admOld, //
         sensorSamples[1].filteredADC,  //
-        sensorSamples[1].resistorVal,  //
-        sensorSamples[1].admVal,  //
+        //sensorSamples[1].resistorVal,  //
+        sensorBottomFilter.midAdm,  //
+        sensorBottomFilter.deltaAdm, //
+        //sensorBottomFilter.admOld, //
         calVal); // in 100%
 
     //ksDelayMsByLoop(10);
