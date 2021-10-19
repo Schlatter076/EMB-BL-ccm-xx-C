@@ -371,6 +371,11 @@ int main()
 
   while (true)
   {
+//    LEDs_Toggle(&gv_ledPeriph[0]);
+//    LEDs_Toggle(&gv_ledPeriph[1]);
+//    LEDs_Toggle(&gv_ledPeriph[4]);
+//    LEDs_Toggle(&gv_ledPeriph[5]);
+//    LEDs_Toggle(&gv_ledPeriph[6]);
     for(int i = 0; i < 10; i++)
     {
       tm30AdcDoSampleing(&gv_tm30TestAdc);
