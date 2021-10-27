@@ -39,8 +39,8 @@
 #define   _MIN_DIFF_F          50
 #define   _GEAR_MIDDLE         730
 
-#define   _FRONT_THRESHOLD     (600)
-#define   _BOTTOM_THRESHOLD    (300)
+#define   _FRONT_THRESHOLD     (500)
+#define   _BOTTOM_THRESHOLD    (400)
 
 #define   __PIN_TO_PC           0x12
 #define   __PIN_FROM_PC         0x14
@@ -290,9 +290,9 @@ void bissell_timer0_callback(void)
   TIMx_ClrFlag(&blTimer, NRF_TIMER_CC_CHANNEL0);
 }
 
-void pressureFilter(SensorFilter_t *filter, ksS32 threshold)
+void pressureFilter(SensorFilter_t *filter, ksS32 initForce, ksS32 threshold)
 {
-  if((filter->midAdm - filter->admOld) > threshold)
+  if((filter->midAdm - initForce) > threshold)
   {
     filter->deltaAdm = threshold;
     filter->admOld = filter->midAdm;
@@ -303,6 +303,10 @@ void pressureFilter(SensorFilter_t *filter, ksS32 threshold)
     filter->admOld = filter->midAdm;
   }
 }
+
+
+ksS32 lv_frontInitForce = 0;
+ksS32 lv_bottomInitForce = 0;
 
 void pressureInit(void)
 {
@@ -317,9 +321,11 @@ void pressureInit(void)
     sensorFrontFilter.midAdmOld = sensorFrontFilter.midAdm;
     sensorFrontFilter.deltaAdm = 0;
     sensorFrontFilter.admOld = sensorFrontFilter.midAdm;
+    lv_frontInitForce = sensorFrontFilter.midAdm;
     sensorBottomFilter.midAdmOld = sensorBottomFilter.midAdm;
     sensorBottomFilter.deltaAdm = 0;
     sensorBottomFilter.admOld = sensorBottomFilter.midAdm;
+    lv_bottomInitForce = sensorBottomFilter.midAdm;
   }
 }
 
@@ -388,8 +394,8 @@ int main()
 
     sensorFrontFilter.midAdm = GetWidthNum(GetMedianNum(sensorFrontFilter.admBuf, 10), &sensorFrontFilter.midAdmOld, 10);
     sensorBottomFilter.midAdm = GetWidthNum(GetMedianNum(sensorBottomFilter.admBuf, 10), &sensorBottomFilter.midAdmOld, 10);
-    pressureFilter(&sensorFrontFilter, _FRONT_THRESHOLD);
-    pressureFilter(&sensorBottomFilter, _BOTTOM_THRESHOLD);
+    pressureFilter(&sensorFrontFilter, lv_frontInitForce, _FRONT_THRESHOLD);
+    pressureFilter(&sensorBottomFilter, lv_bottomInitForce, _BOTTOM_THRESHOLD);
     pressureInit();
     if(_tracer_Recved == uTracer[__UTRACER_IDX_1].rxBuf.status)
     {
@@ -401,16 +407,18 @@ int main()
     }
     calVal = readCalVal();
     clutchSwitch();
-    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d\n", //format
+    __uTRACER_PRINTF(__TRACER_OUT, true, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n", //format
         sensorSamples[0].filteredADC,  //
         //sensorSamples[0].resistorVal,  //
         sensorFrontFilter.midAdm,  //
         sensorFrontFilter.deltaAdm, //
+        lv_frontInitForce,
         //sensorFrontFilter.admOld, //
         sensorSamples[1].filteredADC,  //
         //sensorSamples[1].resistorVal,  //
         sensorBottomFilter.midAdm,  //
         sensorBottomFilter.deltaAdm, //
+        lv_bottomInitForce,
         //sensorBottomFilter.admOld, //
         calVal); // in 100%
 
